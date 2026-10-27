@@ -1,0 +1,1132 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Bayou City Hustle</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+html{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}[hidden]{display:none!important}img{max-width:100%}
+/* Layout: humid Houston sunset scene up top, trading board below; dashboard on desktop, stacked on phone. Single committed dark look (asphalt at night, sodium streetlights, candy paint). */
+:root{
+  color-scheme: dark;
+  --asphalt:#15110d;
+  --tar:#1e1813;
+  --slab:#2a221a;
+  --line:#3f3327;
+  --cream:#f2e7d3;
+  --dust:#a99a84;
+  --sodium:#f2a23c;
+  --candy:#a24fd4;
+  --candy-deep:#5a1f86;
+  --gulf:#3db3a2;
+  --brick:#e0563f;
+  --gold:#e6c35c;
+  --f-display:'Alfa Slab One', Rockwell, 'Roboto Slab', Georgia, serif;
+  --f-body:'Barlow', 'Segoe UI', system-ui, sans-serif;
+  --f-label:'Barlow Condensed', 'Arial Narrow', 'Barlow', sans-serif;
+  --f-num:'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{background:var(--asphalt);color:var(--cream);font:16px/1.45 var(--f-body);-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--tar)}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--sodium);outline-offset:2px}
+h1,h2,h3{text-wrap:balance;margin:0}
+.wrap{max-width:1240px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.eyebrow{font:600 12px/1 var(--f-label);letter-spacing:.14em;text-transform:uppercase;color:var(--sodium)}
+.num,.mono{font-family:var(--f-num);font-variant-numeric:tabular-nums}
+.btn{background:var(--slab);border:1px solid var(--line);border-radius:4px;padding:9px 14px;font:600 14px/1 var(--f-label);letter-spacing:.08em;text-transform:uppercase;transition:transform .08s,background .15s,border-color .15s}
+.btn:hover:not(:disabled){border-color:var(--sodium)}
+.btn:active:not(:disabled){transform:translateY(1px)}
+.btn:disabled{opacity:.35;cursor:not-allowed}
+.btn.buy{background:#1d3a35;border-color:#2d6158;color:#bff0e6}
+.btn.sell{background:#4a3010;border-color:#7a5218;color:#ffd9a0}
+.btn.go{background:var(--sodium);border-color:var(--sodium);color:#1a1006}
+.btn.go:hover:not(:disabled){background:#ffb655}
+.btn.candy{background:linear-gradient(135deg,var(--candy-deep),var(--candy));border-color:var(--candy);color:#fff}
+.btn.danger{background:#4d1a12;border-color:#8b2f20;color:#ffc9bd}
+.btn.sm{padding:7px 10px;font-size:13px}
+
+/* ---------- START ---------- */
+#start{min-height:100%;padding-bottom:48px}
+.hero{position:relative;height:clamp(280px,46vw,440px);overflow:hidden;border-bottom:1px solid var(--line)}
+.hero canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.hero::after{content:"";position:absolute;inset:auto 0 0;height:55%;background:linear-gradient(to bottom,transparent,var(--asphalt));pointer-events:none}
+.hero-ov{position:absolute;inset:auto 0 0;z-index:1;padding-block:0 26px}
+.kicker{font:700 clamp(14px,2vw,18px)/1 var(--f-label);letter-spacing:.32em;text-transform:uppercase;color:var(--cream);opacity:.9}
+.title{font-family:var(--f-display);font-size:clamp(54px,11vw,128px);line-height:.88;letter-spacing:.01em;margin:6px 0 10px;
+  background:linear-gradient(170deg,#f6d9ff 0%,#c27ef0 22%,#7b2cbf 48%,#3a0d63 62%,#b066e6 80%,#f0c4ff 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 4px 0 #0c0806) drop-shadow(0 0 22px rgba(162,79,212,.35))}
+.tagline{max-width:58ch;color:var(--cream);font-size:clamp(15px,1.8vw,18px)}
+.pick-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:end;gap:12px;margin:28px 0 14px}
+.pick-head h2{font-family:var(--f-display);font-size:26px;font-weight:400}
+.chars{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px}
+.char{display:grid;grid-template-columns:96px minmax(0,1fr);gap:14px;text-align:left;background:var(--tar);border:1px solid var(--line);border-radius:8px;padding:14px;transition:border-color .15s,box-shadow .15s,transform .15s}
+.char:hover{transform:translateY(-2px);border-color:#5a4a38}
+.char[aria-pressed="true"]{border-color:var(--sodium);box-shadow:0 0 0 1px var(--sodium),0 10px 30px -12px rgba(242,162,60,.5)}
+.char .portrait{width:96px;height:96px;border-radius:6px}
+.char h3{font:400 19px/1.1 var(--f-display)}
+.char .from{font:600 12px/1 var(--f-label);letter-spacing:.12em;text-transform:uppercase;color:var(--dust);margin:5px 0 8px}
+.char .perk{font-size:14px;color:var(--cream)}
+.char .perk b{color:var(--sodium);font-weight:600}
+.statbars{grid-column:1/-1;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:2px}
+.sb label{display:block;font:600 11px/1 var(--f-label);letter-spacing:.1em;text-transform:uppercase;color:var(--dust);margin-bottom:5px}
+.sb i{display:block;height:5px;background:var(--slab);border-radius:3px;overflow:hidden}
+.sb i b{display:block;height:100%;background:var(--sodium)}
+.start-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}
+.start-actions .btn{padding:14px 22px;font-size:16px}
+.rules{margin-top:34px;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px;border-top:1px solid var(--line);padding-top:22px}
+.rules div{font-size:15px;color:var(--dust)}
+.rules b{display:block;color:var(--cream);font:400 16px/1.2 var(--f-display);margin-bottom:4px}
+
+/* ---------- GAME ---------- */
+.hud{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--tar);border-bottom:1px solid var(--line)}
+.hud .wrap{display:flex;align-items:center;gap:16px;padding-block:8px;flex-wrap:wrap}
+.brand{font:400 19px/1 var(--f-display);color:var(--cream);white-space:nowrap}
+.brand span{background:linear-gradient(135deg,#d9a0ff,var(--candy));-webkit-background-clip:text;background-clip:text;color:transparent}
+.hud-stats{display:flex;gap:6px 20px;flex-wrap:wrap;margin-left:auto}
+.hs label{display:block;font:600 10px/1 var(--f-label);letter-spacing:.12em;text-transform:uppercase;color:var(--dust);margin-bottom:3px}
+.hs b{font:600 15px/1 var(--f-num);font-variant-numeric:tabular-nums}
+.hs.debt b{color:var(--brick)}
+.hs.cash b{color:#9be6c9}
+.menu-btn{margin-left:4px}
+
+.scene{position:relative;height:clamp(210px,30vw,320px);overflow:hidden}
+.scene canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.scene::after{content:"";position:absolute;inset:auto 0 0;height:60%;background:linear-gradient(to bottom,transparent,rgba(21,17,13,.92));pointer-events:none}
+.scene-ov{position:absolute;inset:auto 0 0;z-index:1}
+.scene-ov .wrap{display:flex;justify-content:space-between;align-items:end;gap:16px;padding-block:0 14px;flex-wrap:wrap}
+.loc h1{font:400 clamp(34px,6vw,64px)/.95 var(--f-display);color:var(--cream);text-shadow:0 3px 0 rgba(0,0,0,.6);margin-top:6px}
+.loc p{margin:6px 0 0;color:var(--cream);opacity:.85;font-size:15px;max-width:48ch}
+.me{display:flex;gap:12px;align-items:center;background:rgba(21,17,13,.78);backdrop-filter:blur(6px);border:1px solid var(--line);border-radius:8px;padding:10px 12px;min-width:min(320px,100%)}
+.me .portrait{width:64px;height:64px;border-radius:6px;flex:none}
+.me-body{flex:1;min-width:0}
+.me-top{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+.me-top b{font:400 16px/1.1 var(--f-display);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lvl{font:700 12px/1 var(--f-label);letter-spacing:.1em;color:var(--gold);white-space:nowrap}
+.bar{display:grid;grid-template-columns:44px minmax(0,1fr) auto;align-items:center;gap:8px;margin-top:6px;font:600 11px/1 var(--f-label);letter-spacing:.1em;text-transform:uppercase;color:var(--dust)}
+.bar i{height:7px;background:#0d0a08;border-radius:4px;overflow:hidden;border:1px solid #2c241b}
+.bar i b{display:block;height:100%;border-radius:4px;transition:width .4s}
+.bar .v{font:500 11px/1 var(--f-num);color:var(--cream);min-width:52px;text-align:right}
+.bar.hp b{background:linear-gradient(90deg,#c43c2a,#ef6a4c)}
+.bar.xp b{background:linear-gradient(90deg,#b8902c,var(--gold))}
+.bar.heat b{background:linear-gradient(90deg,#3d5bd6,#e0563f)}
+.pts-pill{margin-left:6px;background:var(--gold);color:#1a1006;border:0;border-radius:10px;padding:3px 8px;font:700 11px/1 var(--f-label);letter-spacing:.08em;text-transform:uppercase}
+
+.ticker{background:#0f0c09;border-block:1px solid var(--line);overflow:hidden;white-space:nowrap;font:500 14px/1 var(--f-label);letter-spacing:.06em;color:var(--dust)}
+.ticker-in{display:inline-block;padding:9px 0;padding-left:100%;animation:tick 48s linear infinite}
+.ticker-in span{margin-right:48px}
+.ticker-in span::before{content:"◆";color:var(--sodium);margin-right:12px;font-size:10px;vertical-align:2px}
+.ticker-in .rumor{color:#d6b3f2}
+@keyframes tick{to{transform:translateX(-100%)}}
+
+.board{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);gap:16px;padding-block:16px 40px;align-items:start}
+@media (max-width:900px){.board{grid-template-columns:minmax(0,1fr)}}
+.panel{background:var(--tar);border:1px solid var(--line);border-radius:8px;min-width:0}
+.panel-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;padding:14px 16px;border-bottom:1px solid var(--line)}
+.panel-head h2{font:400 21px/1.1 var(--f-display)}
+.cap{font:500 13px/1 var(--f-num);color:var(--dust)}
+.cap b{color:var(--cream)}
+.report{margin:12px 16px 0;padding:10px 12px;border-radius:6px;border:1px solid;font-size:14px;display:flex;gap:10px;align-items:flex-start}
+.report.up{border-color:#7a3a2a;background:#2a1510;color:#ffcdb8}
+.report.down{border-color:#2d6158;background:#10241f;color:#c3f2e7}
+.report strong{font:700 12px/1.5 var(--f-label);letter-spacing:.12em;text-transform:uppercase;white-space:nowrap}
+
+.market{padding:6px 0 8px}
+.mrow{display:grid;grid-template-columns:minmax(0,1.5fr) 90px 92px 92px 92px auto;gap:12px;align-items:center;padding:11px 16px;border-bottom:1px solid #2a2219}
+.mrow:last-child{border-bottom:0}
+.mhead{padding-block:8px;font:600 11px/1 var(--f-label);letter-spacing:.12em;text-transform:uppercase;color:var(--dust)}
+.mhead .r{text-align:right}
+.gname b{font:600 17px/1.1 var(--f-body)}
+.gname span{display:block;font-size:13px;color:var(--dust);margin-top:2px}
+.tag{font:700 10px/1 var(--f-label);letter-spacing:.1em;text-transform:uppercase;font-style:normal;padding:3px 6px;border-radius:3px;vertical-align:3px;margin-left:6px}
+.tag.steal{background:var(--gulf);color:#06201c}
+.tag.hot{background:var(--brick);color:#2a0a05}
+.gauge{position:relative;height:6px;border-radius:3px;background:linear-gradient(90deg,#2d6158,#4a4030 50%,#7a3a2a)}
+.gauge span{position:absolute;top:50%;width:11px;height:11px;border-radius:50%;background:var(--cream);border:2px solid var(--asphalt);transform:translate(-50%,-50%)}
+.mrow .num{text-align:right;font-size:15px}
+.mrow .num label{display:none}
+.mrow .own small{display:block;font-size:11px;margin-top:3px}
+.up{color:#8fe3c6}.down{color:#f2937f}
+.acts{display:flex;gap:6px;justify-content:flex-end}
+.mrow.off{opacity:.55}
+.mrow.off .nobody{grid-column:2/6;font-size:14px;color:var(--dust);font-style:italic}
+@media (max-width:640px){
+  .mhead{display:none}
+  .mrow{grid-template-columns:repeat(3,minmax(0,1fr));grid-template-areas:"n n n" "g g g" "b s o" "a a a";gap:8px 12px}
+  .gname{grid-area:n}.gauge{grid-area:g;margin:4px 0}
+  .buyp{grid-area:b}.sellp{grid-area:s}.own{grid-area:o}.acts{grid-area:a}
+  .mrow .num{text-align:left}
+  .mrow .num label{display:block;font:600 10px/1 var(--f-label);letter-spacing:.12em;text-transform:uppercase;color:var(--dust);margin-bottom:3px}
+  .acts .btn{flex:1;padding:11px}
+  .mrow.off{grid-template-areas:"n n n" "x x o"}
+  .mrow.off .nobody{grid-area:x}
+}
+
+.tabs{display:flex;border-bottom:1px solid var(--line);overflow-x:auto}
+.tabs button{flex:1;background:none;border:0;border-bottom:2px solid transparent;padding:13px 10px 11px;font:700 13px/1 var(--f-label);letter-spacing:.12em;text-transform:uppercase;color:var(--dust);white-space:nowrap}
+.tabs button[aria-selected="true"]{color:var(--cream);border-bottom-color:var(--sodium)}
+.tabs button .dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--gold);margin-left:6px;vertical-align:1px}
+.tab-body{padding:16px}
+.tab-body h3{font:400 19px/1.15 var(--f-display);margin-bottom:4px}
+.tab-body .blurb{color:var(--dust);font-size:14px;margin:0 0 14px}
+
+.map{width:100%;height:auto;display:block;background:#120e0b;border:1px solid var(--line);border-radius:6px}
+.map .bayou{fill:none;stroke:#2c5a52;stroke-width:1.6;stroke-linecap:round}
+.map .loop{fill:none;stroke:#4a3d2f;stroke-width:1.4}
+.map .belt{fill:none;stroke:#2e261d;stroke-width:1;stroke-dasharray:2 1.5}
+.map .fwy{fill:none;stroke:#3a3026;stroke-width:1.1}
+.map .lbl{font:600 2.6px var(--f-label);fill:#6d5e4c;letter-spacing:.1px}
+.map .d circle{fill:#2a221a;stroke:#6d5e4c;stroke-width:.5;transition:fill .15s}
+.map .d text{font:700 3.2px var(--f-label);fill:var(--cream);letter-spacing:.1px;pointer-events:none}
+.map .d{cursor:pointer}
+.map .d:hover circle,.map .d:focus circle{fill:var(--candy);stroke:#e2b8ff}
+.map .d:focus{outline:none}
+.map .d.here circle{fill:var(--sodium);stroke:#ffd9a0}
+.map .d.here .ring{fill:none;stroke:var(--sodium);stroke-width:.4;animation:ping 2s ease-out infinite;transform-box:fill-box;transform-origin:center}
+@keyframes ping{from{transform:scale(1);opacity:.9}to{transform:scale(2.6);opacity:0}}
+.dests{display:grid;gap:6px;margin-top:12px}
+.dest{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 10px;align-items:center;text-align:left;background:var(--slab);border:1px solid var(--line);border-radius:6px;padding:10px 12px}
+.dest:hover:not(:disabled){border-color:var(--candy)}
+.dest:disabled{opacity:.5;cursor:default}
+.dest b{font:600 16px/1.1 var(--f-body)}
+.dest small{grid-column:1;font-size:12px;color:var(--dust)}
+.dest .gas{grid-row:1/3;grid-column:2;font:500 13px/1.3 var(--f-num);color:var(--dust);text-align:right}
+.lastday{margin-top:12px;padding:12px;border:1px dashed var(--sodium);border-radius:6px;font-size:14px}
+
+.list{display:grid;gap:8px}
+.li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px;align-items:center;background:var(--slab);border:1px solid var(--line);border-radius:6px;padding:10px 12px}
+.li b{font-weight:600}
+.li small{color:var(--dust);font-size:13px;display:block}
+.li .p{font:500 14px/1 var(--f-num);text-align:right}
+.li.owned{border-color:#5a4a38}
+.li .who{display:flex;gap:10px;align-items:center;min-width:0}
+.li .who .portrait{width:44px;height:44px;border-radius:5px;flex:none}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.amt{flex:1;min-width:120px;background:#0f0c09;border:1px solid var(--line);border-radius:4px;padding:9px 10px;color:var(--cream);font:500 15px var(--f-num)}
+.kv{display:grid;grid-template-columns:auto minmax(0,1fr);gap:6px 14px;font-size:14px;margin:10px 0 16px}
+.kv dt{color:var(--dust)}
+.kv dd{margin:0;text-align:right;font-family:var(--f-num)}
+.sect{font:600 12px/1 var(--f-label);letter-spacing:.14em;text-transform:uppercase;color:var(--dust);margin:18px 0 8px}
+.sect:first-child{margin-top:0}
+.statrow{display:grid;grid-template-columns:72px minmax(0,1fr) 24px;gap:10px;align-items:center;margin:8px 0}
+.statrow label{font:700 12px/1 var(--f-label);letter-spacing:.1em;text-transform:uppercase}
+.statrow i{height:8px;background:#0d0a08;border-radius:4px;border:1px solid #2c241b;overflow:hidden}
+.statrow i b{display:block;height:100%;background:var(--sodium)}
+.statrow span{font:600 14px var(--f-num);text-align:right}
+.statrow small{grid-column:2/4;font-size:12px;color:var(--dust);margin-top:-4px}
+.hustler{display:flex;gap:14px;align-items:center;margin-bottom:12px}
+.hustler .portrait{width:84px;height:84px;border-radius:6px}
+
+/* ---------- MODAL ---------- */
+#modal{position:fixed;inset:0;z-index:50;display:grid;place-items:center;background:rgba(8,6,4,.78);backdrop-filter:blur(4px);padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(16px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.mbox{width:min(580px,100%);max-height:100%;overflow:auto;background:var(--tar);border:1px solid #5a4a38;border-radius:10px;padding:22px;box-shadow:0 30px 80px -20px #000;animation:pop .2s ease-out}
+@keyframes pop{from{transform:translateY(10px) scale(.98);opacity:0}}
+.mbox h2{font:400 26px/1.1 var(--f-display);margin:8px 0 10px}
+.mbox p{margin:0 0 12px;font-size:16px}
+.mbox .choices{display:grid;gap:8px;margin-top:16px}
+.mbox .choices .btn{text-align:left;padding:13px 14px;font-size:15px;text-transform:none;letter-spacing:.02em;font-family:var(--f-body);font-weight:600}
+.outcome{margin-top:14px;padding:12px 14px;border-left:3px solid var(--sodium);background:#16110c;border-radius:0 6px 6px 0}
+.qtyrow{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0}
+.qtyrow .btn{flex:1}
+input[type=range]{width:100%;accent-color:var(--sodium);margin:14px 0 4px}
+.tot{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin:12px 0 16px;padding:12px 14px;background:#0f0c09;border-radius:6px}
+.tot b{font:600 24px/1 var(--f-num)}
+.tot span{color:var(--dust);font-size:14px}
+.mfoot{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+
+/* combat */
+.foes{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0}
+.foe{position:relative;width:92px;text-align:center}
+.foe .portrait{width:92px;height:92px;border-radius:6px;border:1px solid var(--line)}
+.foe.dead .portrait{filter:grayscale(1) brightness(.4)}
+.foe .hpb{height:6px;background:#0d0a08;border-radius:3px;margin-top:6px;overflow:hidden}
+.foe .hpb b{display:block;height:100%;background:var(--brick)}
+.foe small{font:600 11px/1.2 var(--f-label);letter-spacing:.08em;text-transform:uppercase;color:var(--dust)}
+.vs{display:flex;gap:12px;align-items:center;padding:10px;background:#16110c;border-radius:6px;position:relative}
+.vs .portrait{width:56px;height:56px;border-radius:5px}
+.vs .grow{flex:1;min-width:0}
+.crewchips{display:flex;gap:4px;margin-top:6px;flex-wrap:wrap}
+.crewchips span{font:600 11px/1 var(--f-label);letter-spacing:.06em;background:var(--slab);border:1px solid var(--line);border-radius:10px;padding:3px 7px}
+.clog{margin:12px 0;padding:10px 12px;background:#0f0c09;border-radius:6px;font:500 13px/1.55 var(--f-num);color:var(--dust);min-height:96px}
+.clog div:last-child{color:var(--cream)}
+.cacts{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px}
+.cacts .btn{padding:13px 10px}
+.cacts .btn small{display:block;font:500 11px/1.2 var(--f-body);letter-spacing:0;text-transform:none;opacity:.75;margin-top:4px}
+.hit{animation:shake .35s}
+@keyframes shake{20%{transform:translateX(-5px)}40%{transform:translateX(5px)}60%{transform:translateX(-3px)}80%{transform:translateX(2px)}}
+.dmg{position:absolute;left:50%;top:30%;font:700 22px/1 var(--f-display);color:#ffd36b;text-shadow:0 2px 0 #000;pointer-events:none;animation:float .9s ease-out forwards;transform:translateX(-50%)}
+.dmg.me{color:#ff7a62;top:10%}
+@keyframes float{to{transform:translate(-50%,-34px);opacity:0}}
+.lvlgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:14px}
+.lvlgrid .btn{padding:14px;text-transform:none;font-family:var(--f-body);letter-spacing:0;text-align:left}
+.lvlgrid .btn b{display:block;font:700 14px/1 var(--f-label);letter-spacing:.12em;text-transform:uppercase;margin-bottom:4px}
+.lvlgrid .btn small{font-size:12px;color:var(--dust)}
+.big-num{font:600 clamp(34px,7vw,48px)/1 var(--f-num);margin:6px 0 4px}
+
+#toasts{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:60;display:grid;gap:6px;width:min(420px,calc(100% - 32px));pointer-events:none}
+.toast{background:#2a221a;border:1px solid #5a4a38;border-radius:6px;padding:10px 14px;font-size:14px;box-shadow:0 10px 30px -10px #000;animation:pop .2s ease-out}
+.toast.good{border-color:#2d6158}
+.toast.bad{border-color:#8b2f20}
+.toast.lvl{border-color:var(--gold);color:var(--gold)}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  .ticker-in{padding-left:16px;white-space:normal}
+}
+</style>
+</head>
+<body>
+
+
+<div id="start">
+  <div class="hero">
+    <canvas id="startSky"></canvas>
+    <div class="hero-ov"><div class="wrap">
+      <div class="kicker">Houston, Texas · 30 days</div>
+      <div class="title">Bayou City<br>Hustle</div>
+      <p class="tagline">Uncle Dollar fronted you $5,500 at 10% a day. Buy low in Gulfton, sell high in the Galleria, dodge HPD on the 610, and build a name before the month runs out.</p>
+    </div></div>
+  </div>
+  <div class="wrap">
+    <div class="pick-head">
+      <h2>Pick your hustler</h2>
+      <div class="eyebrow">Each one starts in their own neighborhood</div>
+    </div>
+    <div class="chars" id="chars"></div>
+    <div class="start-actions">
+      <button class="btn go" id="btnStart">Hit the streets</button>
+      <button class="btn" id="btnContinue" hidden>Continue saved run</button>
+    </div>
+    <div class="rules">
+      <div><b>Trade the city</b>Every neighborhood sets its own prices each day. Watch the street reports. A raid in Pasadena or rodeo week in Third Ward can swing a price four times over.</div>
+      <div><b>Every drive costs a day</b>Gas, tolls, and whatever's waiting on the feeder road. The 10% vig on your loan compounds every sunrise.</div>
+      <div><b>Level up</b>Profit and fights earn XP. Spend points on Grit, Charm, Smarts or Driving. Hire a crew, buy a slab with a bigger trunk.</div>
+      <div><b>Watch your heat</b>Big trades draw attention. High heat means more stops by HPD and the constables. A fish fry donation goes a long way.</div>
+    </div>
+  </div>
+</div>
+
+<div id="game" hidden>
+  <header class="hud"><div class="wrap">
+    <div class="brand">Bayou City <span>Hustle</span></div>
+    <div class="hud-stats">
+      <div class="hs"><label>Day</label><b id="hDay"></b></div>
+      <div class="hs cash"><label>Cash</label><b id="hCash"></b></div>
+      <div class="hs"><label>Bank</label><b id="hBank"></b></div>
+      <div class="hs debt"><label>Owe Uncle Dollar</label><b id="hDebt"></b></div>
+      <div class="hs"><label>Trunk</label><b id="hCap"></b></div>
+    </div>
+    <button class="btn sm menu-btn" id="btnMenu">Menu</button>
+  </div></header>
+
+  <section class="scene">
+    <canvas id="sceneSky"></canvas>
+    <div class="scene-ov"><div class="wrap">
+      <div class="loc">
+        <div class="eyebrow" id="sTime"></div>
+        <h1 id="sLoc"></h1>
+        <p id="sTag"></p>
+      </div>
+      <div class="me" id="me"></div>
+    </div></div>
+  </section>
+
+  <div class="ticker" aria-live="polite"><div class="ticker-in" id="ticker"></div></div>
+
+  <main class="wrap board">
+    <section class="panel">
+      <div class="panel-head">
+        <h2 id="mTitle">Street prices</h2>
+        <div class="cap" id="mCap"></div>
+      </div>
+      <div id="report"></div>
+      <div class="market" id="market"></div>
+    </section>
+    <section class="panel">
+      <nav class="tabs" role="tablist" id="tabs"></nav>
+      <div class="tab-body" id="tabBody"></div>
+    </section>
+  </main>
+</div>
+
+<div id="modal" hidden><div class="mbox" id="modalBox" role="dialog" aria-modal="true"></div></div>
+<div id="toasts"></div>
+
+<script>
+(function(){
+'use strict';
+const $=s=>document.querySelector(s);
+const rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const chance=p=>Math.random()<p;
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const money=n=>(n<0?'-':'')+'$'+Math.abs(Math.round(n)).toLocaleString('en-US');
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const REDUCED=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+const SAVE_KEY='bayou-city-hustle-v1';
+
+/* ================= DATA ================= */
+const GOODS=[
+  {id:'pills',name:'Pills',desc:'Pressed bars, by the pack',min:80,max:320},
+  {id:'ice',name:'Ice',desc:'Cooked out east of the Beltway',min:220,max:700},
+  {id:'kush',name:'Kush',desc:'Gulf Coast greenhouse, by the zip',min:300,max:900},
+  {id:'lean',name:'Lean',desc:'Purple, by the pint',min:500,max:1400},
+  {id:'shrooms',name:'Shrooms',desc:'Grown in a barn out past Katy',min:550,max:1300},
+  {id:'molly',name:'Molly',desc:'Midtown club demand',min:1100,max:2900},
+  {id:'swangas',name:'Hot Swangas',desc:'Stolen 84s, still chromed',min:1800,max:5200},
+  {id:'coke',name:'Coke',desc:'Came in off the Ship Channel',min:14000,max:28000},
+];
+const DISTRICTS=[
+  {id:'downtown',name:'Downtown',tag:'Glass towers, tunnel lunches, and money that never sleeps.',x:52,y:43,svc:'bank',sky:'towers',mods:{coke:1.12,molly:1.1}},
+  {id:'fifth',name:'Fifth Ward',tag:'Rail yards and shotgun houses on the north bank of Buffalo Bayou.',x:61,y:34,svc:'shark',sky:'rail',mods:{lean:.9,pills:.9}},
+  {id:'third',name:'Third Ward',tag:'Emancipation Park, Dowling St corners, and the barbershop where everybody knows somebody.',x:57,y:56,svc:'crew',sky:'houses',mods:{kush:.92}},
+  {id:'montrose',name:'Montrose',tag:'Bungalows under live oaks, bars on Westheimer, a clinic that takes cash.',x:43,y:53,svc:'clinic',sky:'bungalows',mods:{shrooms:.85,molly:.95}},
+  {id:'galleria',name:'Galleria',tag:'Williams Tower and clients who pay whatever you ask.',x:29,y:49,svc:'boutique',sky:'galleria',mods:{coke:1.28,molly:1.2,swangas:1.15,kush:1.12}},
+  {id:'gulfton',name:'Gulfton',tag:'The densest square mile in Texas. Wholesale prices on everything.',x:29,y:65,svc:'plug',sky:'apartments',mods:{all:.86}},
+  {id:'southside',name:'Southside',tag:'Sunnyside slab shops, candy paint, swangas leaning on MLK.',x:55,y:79,svc:'garage',sky:'stripmall',mods:{lean:.8,swangas:.75}},
+  {id:'pasadena',name:'Pasadena',tag:'Refinery flares along the Ship Channel. It smells like money.',x:83,y:60,svc:'arms',sky:'refinery',mods:{ice:.7,coke:.88}},
+];
+const SERVICES={
+  bank:{tab:'Bank',name:'First Bayou Savings',blurb:'3% a day on deposits. The only safe place in this city for your money.'},
+  shark:{tab:'Loan',name:"Uncle Dollar's Pawn & Loan",blurb:'10% a day, compounding. He was patient last month. He will not be patient next month.'},
+  crew:{tab:'Crew',name:'Dowling St Barbershop',blurb:'Everybody knows somebody looking for work. Crew costs $120 a day each, paid at sunrise. Each adds trunk space and backup.'},
+  clinic:{tab:'Clinic',name:'Westheimer Urgent Care',blurb:'Cash only, no questions. $25 per point patched up.'},
+  boutique:{tab:'Shop',name:'Galleria, second floor',blurb:'Look the part and people pay you more.'},
+  plug:{tab:'Plug',name:'Hillcroft phone shop',blurb:'Burners, scanners, and the right window tint.'},
+  garage:{tab:'Garage',name:"Swangin' Customs, MLK Blvd",blurb:'Candy paint, 84s, trunks that pop. Your current ride trades in at half.'},
+  arms:{tab:'Arms',name:'Red Bluff pawn counter',blurb:'Cash, no paperwork, no refunds.'},
+};
+const CARS=[
+  {name:"'89 Cutlass Supreme",cap:100,run:0,price:0,desc:'Primer gray. Runs.'},
+  {name:'Candy Slab on 84s',cap:150,run:.08,price:9000,desc:'Grape candy paint, swangas, trunk that pops.'},
+  {name:'Box Chevy Caprice',cap:210,run:.12,price:22000,desc:'Big body, bigger trunk, fifth wheel on the back.'},
+  {name:'Lifted F-250',cap:300,run:.05,price:42000,desc:'Bed full of "landscaping supplies."'},
+];
+const WEAPONS=[
+  {name:'Bare hands',dmg:[0,0],price:0},
+  {name:'Aluminum bat',dmg:[3,6],price:450},
+  {name:'Pistol',dmg:[7,13],price:3500},
+  {name:'Pump shotgun',dmg:[12,20],price:9500},
+];
+const ITEMS={
+  boutique:[
+    {key:'vest',name:'Kevlar vest',price:2500,desc:'Takes about a third off every hit.'},
+    {key:'grill',name:'Gold grill',price:3000,desc:'+1 Charm. People remember the smile.'},
+    {key:'fit',name:'Designer fit',price:6500,desc:'+1 Charm. Better prices all over town.'},
+  ],
+  plug:[
+    {key:'burner',name:'Burner phones',price:1200,desc:'Heat builds 40% slower.'},
+    {key:'tint',name:'Limo tint',price:2000,desc:'+15% chance to lose a tail.'},
+    {key:'scanner',name:'Police scanner',price:4500,desc:'Fewer stops on the road.'},
+  ],
+};
+const SKINS=['#3f2718','#4f3020','#5c3a22','#7a4e2e','#9c6a44','#b6825a','#d2a07a','#e6bf9a'];
+const CHARS=[
+  {id:'tre',name:'Tre "Smooth" Wallace',short:'Tre',from:'Third Ward',home:'third',perk:'Smooth Talker',perkText:'Buys 8% cheaper and sells 8% higher.',stats:{grit:3,charm:7,smarts:4,drive:3},
+   look:{skin:'#6b4429',hair:'waves',hairC:'#18100b',shirt:'#6f2a8a',acc:['chain'],bg:['#2d1440','#7a2b8f']}},
+  {id:'rosa',name:'Rosa "La Jefa" Medina',short:'Rosa',from:'Gulfton',home:'gulfton',perk:'Plugged In',perkText:"Hears tomorrow's street rumors every day. Heat builds 30% slower.",stats:{grit:3,charm:4,smarts:7,drive:3},
+   look:{skin:'#b07a50',hair:'bun',hairC:'#26160d',shirt:'#24786d',acc:['hoops'],bg:['#0f302c','#2f8f83']}},
+  {id:'deacon',name:'Deacon "Big D" Jones',short:'Deacon',from:'Fifth Ward',home:'fifth',perk:'Built Different',perkText:'125 max HP instead of 100, and hits 25% harder.',stats:{grit:7,charm:3,smarts:3,drive:4},
+   look:{skin:'#4a2e1c',hair:'bald',hairC:'#140e0a',shirt:'#9e3324',acc:['beard'],bg:['#33110c','#b23a2b']}},
+  {id:'swang',name:'Lil Swang',short:'Swang',from:'Southside',home:'southside',perk:'Wheelman',perkText:'+30 trunk space and a much better shot at losing a tail.',stats:{grit:3,charm:4,smarts:3,drive:7},
+   look:{skin:'#5c3a22',hair:'cap',hairC:'#b9801f',shirt:'#c8902a',acc:['grill'],bg:['#33230a','#c8902a']}},
+];
+const STAT_INFO={
+  grit:{label:'Grit',help:'Damage, accuracy, and how hard you are to scare.'},
+  charm:{label:'Charm',help:'+1% on every buy and sell. Better bribes.'},
+  smarts:{label:'Smarts',help:'Crits, less heat, spotting setups. At 6+ you hear rumors.'},
+  drive:{label:'Driving',help:'Losing tails, dodging hits, flooded underpasses.'},
+};
+const FOES={
+  cops:{name:'HPD Patrol',who:'officer',count:[1,3],hp:[16,24],dmg:[3,7],xp:18,loot:[0,0],
+    intro:'Red and blue in the mirror. Two cruisers box you in on the feeder road.',look:()=>({skin:pick(SKINS),hair:'police',shirt:'#1b2747',acc:['badge'],bg:['#0b1222','#27406b']})},
+  constables:{name:'Harris County Constables',who:'deputy',count:[2,3],hp:[18,26],dmg:[4,8],xp:22,loot:[0,0],
+    intro:'Precinct 7 constables waving you onto the shoulder. One has his hand on his holster.',look:()=>({skin:pick(SKINS),hair:'stetson',shirt:'#5a4a2e',acc:['badge','shades'],bg:['#1f180c','#6b5530']})},
+  crew:{name:'Rival crew',who:'shooter',count:[2,4],hp:[12,20],dmg:[3,8],xp:15,loot:[200,1400],
+    intro:'A Charger pulls even with you at the light. Somebody in the back says your name.',look:()=>({skin:pick(SKINS),hair:'bandana',shirt:'#222',acc:pick([['chain'],['shades'],[]]),bg:['#2a0c0c','#7a1d1d']})},
+  jackers:{name:'Jackers',who:'jacker',count:[1,3],hp:[10,16],dmg:[2,6],xp:12,loot:[100,800],
+    intro:'Masks in the gas station lot. They want what is in your trunk.',look:()=>({skin:pick(SKINS),hair:'hood',shirt:pick(['#2b2b2b','#3a3326','#1e2a33']),acc:['mask'],bg:['#141414','#3a3a3a']})},
+  enforcers:{name:"Uncle Dollar's enforcers",who:'enforcer',count:[2,3],hp:[20,30],dmg:[5,9],xp:28,loot:[0,0],
+    intro:'Two big men from the pawn shop step out of an Escalade. Uncle Dollar wants to talk about your balance.',look:()=>({skin:pick(SKINS),hair:'bald',hairC:'#111',shirt:'#0d0d0d',acc:['shades','chain'],bg:['#1f1806','#6b5414']})},
+};
+const ROADS=['I-45','the 610 Loop','59 South','I-10 East','288','Beltway 8','Westheimer','MLK Blvd','Telephone Rd','the 225','Bellaire Blvd','Almeda'];
+const CREW_NAMES=['Junebug','Slim','Big Tiny','Marisol','Pooh','Dre','Kase','Toni B','Pepper','Nene','Smoke','Lalo','Biscuit','Coco','Rook'];
+const STORMS=['Tropical Storm Odessa','Hurricane Benny','Tropical Storm Lupe','Hurricane Carmen','Tropical Storm Ike Jr.'];
+const UP_TXT=['Rodeo week has {d} paying anything for {g}.','HPD sweep dried up {g} in {d}. Buyers are desperate.','Astros clinched. {d} is partying and {g} is gone.','Big wedding in {d}. Everybody wants {g}.'];
+const DN_TXT=['A lab got raided near {d} and everybody is dumping {g}. Prices in the dirt.','A container came off the Ship Channel. {g} is cheap in {d}.','Somebody flooded {d} with {g}. Buy while it lasts.','Heat on the supplier in {d}. They are selling {g} at cost to get out.'];
+const FLAVOR=['Grackles took over the H-E-B parking lot on Navigation again.','Metro says the Red Line is running 20 minutes late.','Heat index hits 108. Mosquito trucks out tonight.','Whataburger on Westheimer reopens after the storm.','Traffic backed up from the Pierce Elevated to the Galleria.','Rockets fans still arguing about the trade.','Somebody painted the Biggie mural on Montrose again.','Ship Channel Bridge closed for an hour after a fender bender.','Swangers stretching down MLK for the Sunday slab parade.','Bayou rising behind the Beer Can House.'];
+
+/* ================= STATE ================= */
+let state=null;
+let tab='map';
+let selChar='tre';
+const D=id=>DISTRICTS.find(d=>d.id===id);
+const G=id=>GOODS.find(g=>g.id===id);
+const CH=()=>CHARS.find(c=>c.id===state.cid);
+const need=l=>Math.round(60*Math.pow(l,1.7));
+function cap(){return CARS[state.car].cap+state.crew.length*15+(state.cid==='swang'?30:0)}
+function used(){return Object.values(state.inv).reduce((a,b)=>a+b,0)}
+function free(){return Math.max(0,cap()-used())}
+function priceMods(){const c=state.stats.charm*.01+(state.cid==='tre'?.08:0);return{b:1-c,s:1+c}}
+function heatMult(){return (state.cid==='rosa'?.7:1)*(state.gear.burner?.6:1)*Math.max(.5,1-state.stats.smarts*.02)}
+function hearsRumors(){return state.cid==='rosa'||state.stats.smarts>=6}
+
+function newState(cid){
+  const C=CHARS.find(c=>c.id===cid);
+  const s={v:1,cid,stats:{...C.stats},lvl:1,xp:0,pts:0,maxHp:cid==='deacon'?125:100,hp:0,
+    cash:2000,bank:0,debt:5500,day:1,maxDay:30,loc:C.home,inv:{},avg:{},
+    car:0,weapon:0,gear:{},crew:[],heat:0,prices:{},today:[],tomorrow:[],news:[],
+    hires:[],hiresKey:'',storm:0,stormName:'',record:{best:0,fights:0,won:0,sold:0},over:false};
+  s.hp=s.maxHp;
+  return s;
+}
+function genEvent(){
+  const up=chance(.5);
+  return {d:pick(DISTRICTS).id,g:pick(GOODS).id,up,f:up?2+Math.random()*2.2:.22+Math.random()*.25};
+}
+function eventText(e){
+  return pick(e.up?UP_TXT:DN_TXT).replace('{d}',D(e.d).name).replace('{g}',G(e.g).name);
+}
+function genPrices(){
+  const Dt=D(state.loc);const P={};
+  GOODS.forEach(g=>{if(chance(.76))P[g.id]=1});
+  const keys=Object.keys(P);
+  while(keys.length<4){const g=pick(GOODS).id;if(!P[g]){P[g]=1;keys.push(g)}}
+  state.event=null;
+  GOODS.forEach(g=>{
+    const ev=state.today.find(e=>e.d===state.loc&&e.g===g.id);
+    if(!P[g.id]&&!ev){P[g.id]=null;return}
+    let p=rnd(g.min,g.max)*(Dt.mods[g.id]||Dt.mods.all||1);
+    if(state.storm>0)p*=1.12;
+    if(ev){p*=ev.f;state.event={...ev,text:ev.txt||eventText(ev)}}
+    P[g.id]=Math.max(1,Math.round(p));
+  });
+  state.prices=P;
+}
+function pushNews(t,cls){state.news.unshift({t,cls:cls||''});state.news=state.news.slice(0,7)}
+
+function newGame(cid){
+  state=newState(cid);
+  state.today=[genEvent()];state.today.forEach(e=>e.txt=eventText(e));
+  state.tomorrow=[genEvent(),genEvent()];state.tomorrow.forEach(e=>e.txt=eventText(e));
+  genPrices();
+  pushNews(pick(FLAVOR));
+  pushNews(`Uncle Dollar fronted ${CH().short} ${money(5500)} at 10% a day. The clock is running.`);
+  tab='map';
+  save();showGame();
+  showModal((box,close)=>{
+    box.innerHTML=`<div class="eyebrow">Day 1 · ${esc(D(state.loc).name)}</div><h2>Thirty days to get right</h2>
+    <p>You owe Uncle Dollar ${money(state.debt)}. It grows 10% every morning. You have ${money(state.cash)} cash and a ${esc(CARS[0].name)} with room for ${cap()} units.</p>
+    <p>Buy where it's cheap, drive, sell where it's high. Every drive costs a day. Pay him back before day 30, and whatever's left is yours.</p>
+    <div class="mfoot"><button class="btn go" id="ok">Let's work</button></div>`;
+    box.querySelector('#ok').onclick=close;
+  });
+}
+function save(){try{localStorage.setItem(SAVE_KEY,JSON.stringify(state))}catch(e){}}
+function loadSave(){try{const r=localStorage.getItem(SAVE_KEY);if(!r)return null;const s=JSON.parse(r);return s&&s.v===1&&!s.over?s:null}catch(e){return null}}
+function clearSave(){try{localStorage.removeItem(SAVE_KEY)}catch(e){}}
+
+/* ================= PORTRAITS ================= */
+let pid=0;
+function portrait(L,cls){
+  const u='p'+(++pid);const sk=L.skin;const hc=L.hairC||'#141010';const acc=L.acc||[];
+  let back='',hair='';
+  if(L.hair==='hood')back=`<path d="M20 100 L23 50 Q25 10 50 9 Q75 10 77 50 L80 100Z" fill="${L.shirt}"/><path d="M27 52 Q27 19 50 18 Q73 19 73 52 L72 70 Q50 78 28 70Z" fill="#060606" opacity=".55"/>`;
+  switch(L.hair){
+    case 'waves':hair=`<path d="M30.5 41 Q29 17.5 50 17 Q71 17.5 69.5 41 Q67 27.5 50 26.5 Q33 27.5 30.5 41Z" fill="${hc}"/><path d="M36 23 Q50 19 64 23 M33.5 28.5 Q50 23.5 66.5 28.5" stroke="#fff" stroke-opacity=".14" stroke-width="1.2" fill="none"/>`;break;
+    case 'bun':hair=`<circle cx="50" cy="13.5" r="8.5" fill="${hc}"/><path d="M29.5 47 Q26.5 17.5 50 17.5 Q73.5 17.5 70.5 47 Q69 30 50 28 Q35 29 31.5 41Z" fill="${hc}"/>`;break;
+    case 'bald':hair=`<path d="M35 27 Q42 20.5 52 21.5" stroke="#fff" stroke-opacity=".22" stroke-width="3" fill="none" stroke-linecap="round"/>`;break;
+    case 'cap':hair=`<path d="M29.5 36 Q29 14 50 14 Q71 14 70.5 36Z" fill="${hc}"/><path d="M29 34.5 Q50 30.5 71 34.5 L71.5 37.5 Q50 33.5 28.5 37.5Z" fill="#000" opacity=".35"/><path d="M60 33 L87 31 Q87 37.5 70 38.5 L58 37Z" fill="${hc}"/><path d="M60 33 L87 31 Q87 37.5 70 38.5 L58 37Z" fill="#000" opacity=".25"/><text x="49" y="30" font-size="9" text-anchor="middle" fill="#fff" font-family="Alfa Slab One, Georgia, serif">H</text>`;break;
+    case 'police':hair=`<path d="M28 34 Q28 13 50 13 Q72 13 72 34Z" fill="#131b31"/><rect x="27" y="31.5" width="46" height="5" rx="1" fill="#090e1c"/><path d="M28 36 Q50 42 72 36 L70 40 Q50 45 30 40Z" fill="#04060c"/><circle cx="50" cy="24" r="3.2" fill="#d8b24a"/>`;break;
+    case 'stetson':hair=`<ellipse cx="50" cy="31" rx="34" ry="6.5" fill="#bfa77a"/><path d="M33 31 Q32 11 50 12.5 Q68 11 67 31Z" fill="#d6c095"/><rect x="33" y="26.5" width="34" height="4.5" fill="#5a3b1e"/><path d="M43 13.5 Q50 19 57 13.5" stroke="#000" stroke-opacity=".2" fill="none"/>`;break;
+    case 'bandana':hair=`<path d="M29.5 38 Q29 14.5 50 14.5 Q71 14.5 70.5 38 Q50 29.5 29.5 38Z" fill="#a51e1e"/><path d="M69 29 L81 35 L73 38Z" fill="#8c1919"/><circle cx="40" cy="23" r="1.3" fill="#fff" opacity=".6"/><circle cx="58" cy="21" r="1.3" fill="#fff" opacity=".6"/><circle cx="49" cy="27" r="1.1" fill="#fff" opacity=".6"/>`;break;
+  }
+  let beard='',eyes='',mouth='',over='';
+  if(acc.includes('beard'))beard=`<path d="M31.5 45 Q33 67 50 68 Q67 67 68.5 45 Q66 60 58 59 Q50 55.5 42 59 Q34 60 31.5 45Z" fill="#17100c"/>`;
+  if(acc.includes('shades'))eyes=`<rect x="34.5" y="38" width="13" height="7" rx="2.5" fill="#0a0a0a"/><rect x="52.5" y="38" width="13" height="7" rx="2.5" fill="#0a0a0a"/><path d="M47.5 40 L52.5 40" stroke="#0a0a0a" stroke-width="1.6"/><path d="M36 39.5 L41 39.5" stroke="#fff" stroke-opacity=".35" stroke-width="1"/>`;
+  else eyes=`<ellipse cx="43" cy="42" rx="2.2" ry="2.6" fill="#120d0a"/><ellipse cx="57" cy="42" rx="2.2" ry="2.6" fill="#120d0a"/><circle cx="43.7" cy="41.1" r=".75" fill="#fff" opacity=".75"/><circle cx="57.7" cy="41.1" r=".75" fill="#fff" opacity=".75"/><path d="M38 36.5 Q43 34.3 47 36.5 M53 36.5 Q57 34.3 62 36.5" stroke="#120d0a" stroke-width="1.7" fill="none" stroke-linecap="round"/>`;
+  if(acc.includes('mask'))over+=`<path d="M30.5 45 Q31.5 67 50 69 Q68.5 67 69.5 45Z" fill="#0e0e0e"/>`;
+  else if(acc.includes('grill'))mouth=`<path d="M44 55 Q50 58.5 56 55 L55.5 57.5 Q50 60 44.5 57.5Z" fill="#e6c35c"/>`;
+  else mouth=`<path d="M45 56 Q50 58.5 55 56" stroke="#3a1f14" stroke-width="1.7" fill="none" stroke-linecap="round"/>`;
+  if(acc.includes('hoops'))over+=`<circle cx="30.5" cy="52" r="3.6" stroke="#e6c35c" stroke-width="1.5" fill="none"/><circle cx="69.5" cy="52" r="3.6" stroke="#e6c35c" stroke-width="1.5" fill="none"/>`;
+  if(acc.includes('chain'))over+=`<path d="M36 74 Q50 93 64 74" stroke="#e6c35c" stroke-width="2.4" fill="none"/><circle cx="50" cy="86.5" r="3.4" fill="#e6c35c"/>`;
+  if(acc.includes('badge'))over+=`<path d="M62 82 l3.5 -4.5 l3.5 4.5 l-3.5 4.5z" fill="#d8b24a"/>`;
+  return `<svg viewBox="0 0 100 100" class="portrait ${cls||''}" aria-hidden="true"><defs>
+<linearGradient id="${u}b" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${L.bg[0]}"/><stop offset="1" stop-color="${L.bg[1]}"/></linearGradient>
+<radialGradient id="${u}f" cx=".32" cy=".28" r=".85"><stop offset="0" stop-color="#fff" stop-opacity=".24"/><stop offset=".55" stop-color="#fff" stop-opacity="0"/></radialGradient>
+<linearGradient id="${u}r" x1="0" y1="0" x2="1" y2="0"><stop offset=".6" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".35"/></linearGradient>
+</defs><rect width="100" height="100" fill="url(#${u}b)"/><circle cx="80" cy="18" r="32" fill="#fff" opacity=".07"/>${back}
+<path d="M11 100 Q13 73 50 70 Q87 73 89 100Z" fill="${L.shirt}"/><path d="M11 100 Q13 73 50 70 Q87 73 89 100Z" fill="url(#${u}r)"/><path d="M40 71 L50 80 L60 71" stroke="#000" stroke-opacity=".25" stroke-width="2" fill="none"/>
+<rect x="44" y="57" width="12" height="16" fill="${sk}"/><rect x="44" y="57" width="12" height="16" fill="#000" opacity=".28"/>
+<ellipse cx="31" cy="45" rx="3.5" ry="5" fill="${sk}"/><ellipse cx="69" cy="45" rx="3.5" ry="5" fill="${sk}"/>
+<ellipse cx="50" cy="43" rx="19.5" ry="22.5" fill="${sk}"/><ellipse cx="50" cy="43" rx="19.5" ry="22.5" fill="url(#${u}f)"/><ellipse cx="50" cy="43" rx="19.5" ry="22.5" fill="url(#${u}r)"/>
+${beard}<path d="M50 44 Q47.8 50 50.3 51" stroke="#000" stroke-opacity=".28" stroke-width="1.3" fill="none"/>${eyes}${mouth}${hair}${over}</svg>`;
+}
+
+/* ================= SCENE (canvas) ================= */
+function mulberry(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function hashStr(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0}
+const SKY={dawn:['#2a2140','#b05c4c','#f2b26a'],noon:['#6b93a6','#b8bcab','#e8d6aa'],dusk:['#1b1330','#6c2a58','#e57446'],night:['#08070e','#171226','#3d2925'],storm:['#22272c','#3b4346','#5c6461']};
+const FAR={dawn:'rgba(52,32,52,.62)',noon:'rgba(92,104,108,.5)',dusk:'rgba(44,20,44,.66)',night:'rgba(26,20,34,.85)',storm:'rgba(40,46,50,.75)'};
+const HAZE={dawn:'rgba(242,170,110,.35)',noon:'rgba(235,220,180,.45)',dusk:'rgba(229,116,70,.32)',night:'rgba(80,50,30,.35)',storm:'rgba(110,118,114,.5)'};
+const LIGHTS={dawn:.45,noon:.08,dusk:.75,night:1,storm:.6};
+const PHASES=['dawn','noon','dusk','night'];
+const phaseOf=day=>PHASES[(day-1)%4];
+const scenes=new Map();
+
+function buildScene(kind,w,h){
+  const r=mulberry(hashStr(kind));
+  const sc=clamp(w/900,.55,1.4);
+  const gy=Math.round(h*.74);
+  const S={gy,sc,far:[],near:[],wins:[],trees:[],flares:[],beacon:null,stacks:[],palms:[],deck:gy+Math.round((h-gy)*.38)};
+  const far=(x0,x1,minH,maxH,minW,maxW)=>{let x=x0;while(x<x1){const bw=(minW+r()*(maxW-minW))*sc,bh=minH+r()*(maxH-minH);S.far.push({t:'r',x,y:gy-bh,w:bw,h:bh});if(r()<.3)S.far.push({t:'r',x:x+bw*.2,y:gy-bh-bh*.1,w:bw*.6,h:bh*.1});x+=bw+r()*3*sc}};
+  const wins=(x,y,bw,bh,dens)=>{const cols=Math.max(2,Math.floor(bw/(6*sc))),rows=Math.floor(bh/(7*sc));for(let i=0;i<cols;i++)for(let j=1;j<rows;j++)if(r()<dens)S.wins.push({x:x+2*sc+i*(bw-3*sc)/cols,y:y+j*7*sc,w:2.4*sc,h:3*sc,a:.35+r()*.65,f:r()})};
+  const tower=(x,bw,bh,style)=>{const y=gy-bh;S.near.push({t:'r',x,y,w:bw,h:bh});
+    if(style==='step'){S.near.push({t:'r',x:x+bw*.12,y:y-bh*.07,w:bw*.76,h:bh*.07});S.near.push({t:'r',x:x+bw*.28,y:y-bh*.13,w:bw*.44,h:bh*.06})}
+    if(style==='gothic'){for(let i=0;i<3;i++){const sw=bw*(.95-i*.3);S.near.push({t:'tri',x:x+(bw-sw)/2,b:y-i*bh*.055,w:sw,h:bh*.1})}}
+    if(style==='spire')S.near.push({t:'r',x:x+bw/2-1*sc,y:y-bh*.2,w:2*sc,h:bh*.2});
+    if(style==='slant')S.near.push({t:'poly',p:[[x,y],[x+bw,y],[x+bw,y-bh*.14]]});
+    if(style==='pyr')S.near.push({t:'tri',x,b:y,w:bw,h:bh*.12});
+    wins(x,y,bw,bh,.32)};
+  const house=(x,bw,bh,roof)=>{S.near.push({t:'r',x,y:gy-bh,w:bw,h:bh});S.near.push({t:'tri',x:x-2*sc,b:gy-bh,w:bw+4*sc,h:roof});if(r()<.7)S.wins.push({x:x+bw*.3,y:gy-bh*.65,w:4*sc,h:5*sc,a:.6+r()*.4,f:r()})};
+  const tree=(x,rad)=>{const n=5+Math.floor(r()*4);for(let i=0;i<n;i++)S.trees.push({x:x+(r()-.5)*rad*1.6,y:gy-rad*.9-r()*rad*.8,r:rad*(.45+r()*.4)});S.near.push({t:'r',x:x-1.5*sc,y:gy-rad*.8,w:3*sc,h:rad*.8})};
+  const dtCluster=(x0,x1,maxH)=>far(x0,x1,h*.06,maxH,8,16);
+  switch(kind){
+    case 'towers':{
+      far(0,w,h*.12,h*.32,10,22);
+      let x=-10*sc;const styles=['step','gothic','spire','slant','plain','step','pyr','plain'];
+      while(x<w){const bw=(20+r()*28)*sc,bh=h*(.22+r()*.42);tower(x,bw,bh,styles[Math.floor(r()*styles.length)]);x+=bw+(3+r()*10)*sc}
+      S.palms.push({x:w*.08,h:h*.45},{x:w*.93,h:h*.52});break}
+    case 'galleria':{
+      far(0,w,h*.05,h*.16,14,30);
+      for(let i=0;i<5;i++){const bw=(22+r()*20)*sc,bh=h*(.16+r()*.2);tower(w*(.08+i*.15)+(i>2?w*.18:0),bw,bh,r()<.5?'step':'plain')}
+      const tw=34*sc,th=h*.66,tx=w*.6;tower(tx,tw,th,'pyr');S.beacon={x:tx+tw/2,y:gy-th-th*.12};
+      S.near.push({t:'r',x:w*.18,y:gy-h*.08,w:w*.3,h:h*.08});
+      for(let i=0;i<6;i++)S.wins.push({x:w*.2+i*w*.045,y:gy-h*.06,w:w*.03,h:h*.03,a:.8,f:r()});
+      S.palms.push({x:w*.05,h:h*.5},{x:w*.9,h:h*.44});break}
+    case 'refinery':{
+      far(0,w,h*.03,h*.1,20,40);
+      for(let i=0;i<9;i++){const x=w*(.04+i*.11)+r()*20*sc;const bh=h*(.2+r()*.32);const bw=(4+r()*4)*sc;S.near.push({t:'r',x,y:gy-bh,w:bw,h:bh});if(r()<.65)S.flares.push({x:x+bw/2,y:gy-bh,s:.8+r()*.8,ph:r()*6});else S.stacks.push({x:x+bw/2,y:gy-bh,ph:r()});for(let k=1;k<4;k++)if(r()<.5)S.near.push({t:'r',x:x-4*sc,y:gy-bh*k/4,w:bw+8*sc,h:1.6*sc})}
+      for(let i=0;i<7;i++){const x=w*(.02+i*.14)+r()*10;const tw=(26+r()*20)*sc,th=(12+r()*12)*sc;S.near.push({t:'tank',x,y:gy-th,w:tw,h:th})}
+      for(let i=0;i<4;i++)S.near.push({t:'r',x:0,y:gy-h*(.06+i*.025),w:w,h:1.2*sc});
+      for(let i=0;i<40;i++)S.wins.push({x:r()*w,y:gy-r()*h*.35,w:2*sc,h:2*sc,a:.6+r()*.4,f:r()});
+      break}
+    case 'houses':{
+      dtCluster(w*.52,w*.82,h*.38);
+      let x=-5;while(x<w){if(r()<.12){S.near.push({t:'r',x,y:gy-h*.2,w:24*sc,h:h*.2});S.near.push({t:'tri',x:x+7*sc,b:gy-h*.2,w:10*sc,h:h*.17});x+=30*sc;continue}
+        if(r()<.3){tree(x+12*sc,(16+r()*10)*sc);x+=24*sc;continue}
+        const bw=(18+r()*10)*sc;house(x,bw,(15+r()*8)*sc,(8+r()*5)*sc);x+=bw+(4+r()*6)*sc}
+      S.palms.push({x:w*.88,h:h*.5});break}
+    case 'rail':{
+      dtCluster(w*.12,w*.42,h*.42);
+      S.near.push({t:'r',x:w*.62,y:gy-h*.3,w:3*sc,h:h*.3},{t:'r',x:w*.66,y:gy-h*.3,w:3*sc,h:h*.3},{t:'tank',x:w*.6,y:gy-h*.38,w:w*.075,h:h*.1});
+      let x=w*.02;while(x<w){if(x>w*.58&&x<w*.72){x=w*.73;continue}const bw=(40+r()*50)*sc,bh=(14+r()*16)*sc;S.near.push({t:'r',x,y:gy-bh,w:bw,h:bh});const n=Math.floor(bw/(10*sc));for(let i=0;i<n;i++)S.near.push({t:'tri',x:x+i*bw/n,b:gy-bh,w:bw/n,h:5*sc});x+=bw+(10+r()*20)*sc}
+      for(let i=0;i<14;i++)S.near.push({t:'r',x:i*w/13,y:gy-9*sc,w:w/13-3*sc,h:8*sc});
+      S.palms.push({x:w*.94,h:h*.4});break}
+    case 'bungalows':{
+      dtCluster(w*.55,w*.9,h*.45);
+      let x=-5;while(x<w){if(r()<.42){tree(x+14*sc,(18+r()*14)*sc);x+=26*sc;continue}const bw=(22+r()*12)*sc;house(x,bw,(14+r()*6)*sc,(6+r()*4)*sc);x+=bw+(6+r()*6)*sc}
+      S.palms.push({x:w*.07,h:h*.48});break}
+    case 'apartments':{
+      far(0,w*.35,h*.12,h*.3,10,20);
+      let x=-10;while(x<w){const bw=(70+r()*60)*sc,fl=2+Math.floor(r()*2),bh=fl*13*sc;S.near.push({t:'r',x,y:gy-bh,w:bw,h:bh});S.near.push({t:'r',x:x-2*sc,y:gy-bh-3*sc,w:bw+4*sc,h:3*sc});for(let f=0;f<fl;f++)for(let i=0;i<Math.floor(bw/(12*sc));i++)if(r()<.55)S.wins.push({x:x+5*sc+i*12*sc,y:gy-bh+4*sc+f*13*sc,w:5*sc,h:5*sc,a:.5+r()*.5,f:r()});x+=bw+(8+r()*14)*sc;if(r()<.4){tree(x+6*sc,12*sc);x+=14*sc}}
+      S.palms.push({x:w*.22,h:h*.5},{x:w*.8,h:h*.46});break}
+    case 'stripmall':{
+      dtCluster(w*.66,w*.86,h*.36);
+      S.near.push({t:'r',x:w*.05,y:gy-h*.14,w:w*.42,h:h*.14},{t:'r',x:w*.05,y:gy-h*.17,w:w*.42,h:h*.03});
+      for(let i=0;i<7;i++)S.wins.push({x:w*.07+i*w*.058,y:gy-h*.165,w:w*.045,h:h*.022,a:.9,f:r()});
+      for(let i=0;i<7;i++)S.wins.push({x:w*.07+i*w*.058,y:gy-h*.1,w:w*.04,h:h*.06,a:.5,f:r()});
+      S.near.push({t:'r',x:w*.55,y:gy-h*.2,w:w*.16,h:h*.035},{t:'r',x:w*.56,y:gy-h*.165,w:4*sc,h:h*.165},{t:'r',x:w*.7-4*sc,y:gy-h*.165,w:4*sc,h:h*.165});
+      S.wins.push({x:w*.56,y:gy-h*.165,w:w*.14,h:2*sc,a:1,f:.5});
+      S.near.push({t:'r',x:w*.5,y:gy-h*.34,w:3*sc,h:h*.34},{t:'r',x:w*.47,y:gy-h*.36,w:w*.07,h:h*.06});
+      S.wins.push({x:w*.475,y:gy-h*.355,w:w*.06,h:h*.05,a:.9,f:.2});
+      tree(w*.8,16*sc);tree(w*.92,20*sc);
+      S.palms.push({x:w*.74,h:h*.55},{x:w*.02,h:h*.46});break}
+  }
+  return S;
+}
+function drawScene(c,s,t){
+  const dpr=Math.min(2,window.devicePixelRatio||1);const w=c.clientWidth,h=c.clientHeight;if(!w||!h)return;
+  if(c.width!==Math.round(w*dpr)||c.height!==Math.round(h*dpr)){c.width=Math.round(w*dpr);c.height=Math.round(h*dpr);s.data=null}
+  if(!s.data)s.data=buildScene(s.kind,w,h);
+  const ctx=c.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);
+  const S=s.data,ph=s.storm?'storm':s.phase,sky=SKY[ph],gy=S.gy,sc=S.sc;
+  let g=ctx.createLinearGradient(0,0,0,gy);g.addColorStop(0,sky[0]);g.addColorStop(.62,sky[1]);g.addColorStop(1,sky[2]);ctx.fillStyle=g;ctx.fillRect(0,0,w,gy+2);
+  // sun / moon
+  if(ph!=='storm'){
+    const sp={dawn:[.2,gy-h*.08,38],noon:[.72,h*.16,30],dusk:[.8,gy-h*.1,46],night:[.76,h*.2,12]}[ph];
+    const sx=w*sp[0],sy=sp[1],sr=sp[2]*sc;
+    const rg=ctx.createRadialGradient(sx,sy,0,sx,sy,sr*5);
+    const col=ph==='night'?'255,240,210':ph==='noon'?'255,250,235':'255,190,120';
+    rg.addColorStop(0,`rgba(${col},.55)`);rg.addColorStop(.25,`rgba(${col},.18)`);rg.addColorStop(1,`rgba(${col},0)`);
+    ctx.fillStyle=rg;ctx.fillRect(0,0,w,gy);
+    ctx.fillStyle=ph==='night'?'#efe6d2':ph==='noon'?'rgba(255,252,240,.85)':'#ffd38a';
+    ctx.beginPath();ctx.arc(sx,sy,sr,0,Math.PI*2);ctx.fill();
+    if(ph==='night'){const sr2=mulberry(7);ctx.fillStyle='rgba(255,240,220,.7)';for(let i=0;i<50;i++){const x=sr2()*w,y=sr2()*gy*.6;ctx.globalAlpha=.3+.5*Math.abs(Math.sin(t*.001+i));ctx.fillRect(x,y,1.2,1.2)}ctx.globalAlpha=1}
+  }
+  // clouds
+  ctx.fillStyle=ph==='storm'?'rgba(30,34,38,.55)':ph==='night'?'rgba(40,30,50,.35)':'rgba(255,230,210,.16)';
+  for(let i=0;i<5;i++){const cx=((i*w*.27+t*.006*(1+i*.2))%(w+300))-150,cy=h*(.12+i*.07);ctx.beginPath();ctx.ellipse(cx,cy,110*sc,10*sc,0,0,Math.PI*2);ctx.ellipse(cx+60*sc,cy-6*sc,70*sc,9*sc,0,0,Math.PI*2);ctx.fill()}
+  // far
+  ctx.fillStyle=FAR[ph];S.far.forEach(b=>ctx.fillRect(b.x,b.y,b.w,b.h));
+  const hz=ctx.createLinearGradient(0,gy-h*.32,0,gy);hz.addColorStop(0,'rgba(0,0,0,0)');hz.addColorStop(1,HAZE[ph]);ctx.fillStyle=hz;ctx.fillRect(0,gy-h*.32,w,h*.32);
+  // smoke
+  S.stacks.forEach((k,i)=>{for(let j=0;j<6;j++){const u=((t*.00012+k.ph+j/6)%1);ctx.fillStyle=`rgba(${ph==='night'?'90,70,60':'200,190,180'},${.28*(1-u)})`;ctx.beginPath();ctx.arc(k.x+u*60*sc,k.y-u*h*.3,(4+u*18)*sc,0,Math.PI*2);ctx.fill()}});
+  // near silhouettes
+  const NEAR=ph==='noon'?'#2a2420':'#15110e';
+  ctx.fillStyle=NEAR;
+  S.near.forEach(o=>{
+    if(o.t==='r')ctx.fillRect(o.x,o.y,o.w,o.h);
+    else if(o.t==='tri'){ctx.beginPath();ctx.moveTo(o.x,o.b);ctx.lineTo(o.x+o.w/2,o.b-o.h);ctx.lineTo(o.x+o.w,o.b);ctx.fill()}
+    else if(o.t==='poly'){ctx.beginPath();o.p.forEach((p,i)=>i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]));ctx.fill()}
+    else if(o.t==='tank'){ctx.beginPath();ctx.ellipse(o.x+o.w/2,o.y+3*sc,o.w/2,4*sc,0,Math.PI,0);ctx.lineTo(o.x+o.w,o.y+o.h);ctx.lineTo(o.x,o.y+o.h);ctx.fill()}
+  });
+  ctx.fillStyle=ph==='noon'?'#24291f':'#10130e';
+  S.trees.forEach(tr=>{ctx.beginPath();ctx.arc(tr.x,tr.y,tr.r,0,Math.PI*2);ctx.fill()});
+  // windows
+  const la=LIGHTS[ph];
+  if(la>.05){S.wins.forEach(wd=>{const fl=wd.f>.97?(Math.sin(t*.02+wd.f*90)>.3?1:.2):1;ctx.globalAlpha=la*wd.a*fl;ctx.fillStyle=wd.f>.86?'#bfe4ff':'#ffc46b';ctx.fillRect(wd.x,wd.y,wd.w,wd.h)});ctx.globalAlpha=1}
+  // flares
+  S.flares.forEach(f=>{const fh=(8+Math.sin(t*.012+f.ph)*3+Math.sin(t*.031+f.ph*2)*2)*f.s*sc;const rg=ctx.createRadialGradient(f.x,f.y-fh*.5,0,f.x,f.y-fh*.5,fh*3);rg.addColorStop(0,'rgba(255,170,60,.55)');rg.addColorStop(1,'rgba(255,120,30,0)');ctx.fillStyle=rg;ctx.beginPath();ctx.arc(f.x,f.y-fh*.5,fh*3,0,Math.PI*2);ctx.fill();ctx.fillStyle='#ffcf6b';ctx.beginPath();ctx.moveTo(f.x-3*sc,f.y);ctx.quadraticCurveTo(f.x-2*sc,f.y-fh*.6,f.x+Math.sin(t*.02+f.ph)*2*sc,f.y-fh);ctx.quadraticCurveTo(f.x+2*sc,f.y-fh*.5,f.x+3*sc,f.y);ctx.fill()});
+  // beacon
+  if(S.beacon&&ph!=='noon'){const b=S.beacon;const a=t*.0012;ctx.save();ctx.translate(b.x,b.y);ctx.rotate(Math.sin(a)*1.3);const bg=ctx.createLinearGradient(0,0,w*.6,0);bg.addColorStop(0,'rgba(255,240,200,.35)');bg.addColorStop(1,'rgba(255,240,200,0)');ctx.fillStyle=bg;ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(w*.6,-26*sc);ctx.lineTo(w*.6,26*sc);ctx.fill();ctx.rotate(Math.PI);ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(w*.6,-26*sc);ctx.lineTo(w*.6,26*sc);ctx.fill();ctx.restore();ctx.fillStyle='#fff3d6';ctx.beginPath();ctx.arc(b.x,b.y,2.4*sc,0,Math.PI*2);ctx.fill()}
+  // ground
+  ctx.fillStyle=ph==='noon'?'#2b241d':'#110e0b';ctx.fillRect(0,gy,w,h-gy);
+  // freeway
+  const dy=S.deck,dh=7*sc;
+  ctx.fillStyle=ph==='noon'?'#3a3128':'#1c1712';
+  for(let x=20*sc;x<w;x+=90*sc)ctx.fillRect(x,dy+dh,7*sc,h-dy);
+  ctx.fillStyle=ph==='noon'?'#4a4034':'#241e17';ctx.fillRect(0,dy,w,dh);
+  ctx.fillStyle=ph==='noon'?'#5d5243':'#2f271e';ctx.fillRect(0,dy-2*sc,w,2*sc);
+  if(la>.3){for(let x=10*sc;x<w;x+=120*sc){ctx.fillStyle='#2b241c';ctx.fillRect(x,dy-26*sc,1.5*sc,24*sc);const lg=ctx.createRadialGradient(x+4*sc,dy-26*sc,0,x+4*sc,dy-26*sc,26*sc);lg.addColorStop(0,`rgba(255,170,70,${.45*la})`);lg.addColorStop(1,'rgba(255,170,70,0)');ctx.fillStyle=lg;ctx.beginPath();ctx.arc(x+4*sc,dy-26*sc,26*sc,0,Math.PI*2);ctx.fill();ctx.fillStyle='#ffc46b';ctx.fillRect(x+1*sc,dy-27*sc,6*sc,2*sc)}}
+  // cars
+  const dt=s.last?Math.min(60,t-s.last):16;s.last=t;
+  if(s.cars.length<Math.max(4,Math.floor(w/150))&&chance(.03)){const dir=chance(.5)?1:-1;s.cars.push({x:dir>0?-40:w+40,dir,v:(.06+Math.random()*.08)*sc,col:pick(['#7b2cbf','#b23a8f','#1f6fb2','#c8902a','#2c8f6a','#d9d4c7','#a01f1f','#333']),len:(20+Math.random()*10)*sc,slab:chance(.35)})}
+  s.cars=s.cars.filter(cr=>cr.x>-60&&cr.x<w+60);
+  s.cars.forEach(cr=>{cr.x+=cr.dir*cr.v*dt;const ch=6*sc,cy=dy-2*sc-ch;ctx.fillStyle=cr.col;ctx.fillRect(cr.x,cy,cr.len,ch);ctx.fillRect(cr.x+cr.len*.25,cy-4*sc,cr.len*.45,4*sc);ctx.fillStyle='rgba(255,255,255,.18)';ctx.fillRect(cr.x,cy,cr.len,1.2*sc);
+    if(cr.slab){ctx.fillStyle='#e8e2d4';const wy=cy+ch;[cr.x+cr.len*.22,cr.x+cr.len*.78].forEach(wx=>{ctx.beginPath();ctx.moveTo(wx,wy);ctx.lineTo(wx+cr.dir*5*sc,wy);ctx.lineTo(wx,wy-2*sc);ctx.fill()})}
+    if(la>.3){const front=cr.dir>0?cr.x+cr.len:cr.x,back=cr.dir>0?cr.x:cr.x+cr.len;const hg=ctx.createLinearGradient(front,0,front+cr.dir*40*sc,0);hg.addColorStop(0,`rgba(255,240,190,${.5*la})`);hg.addColorStop(1,'rgba(255,240,190,0)');ctx.fillStyle=hg;ctx.beginPath();ctx.moveTo(front,cy+2*sc);ctx.lineTo(front+cr.dir*40*sc,cy-2*sc);ctx.lineTo(front+cr.dir*40*sc,cy+8*sc);ctx.fill();ctx.fillStyle='#ff3a2a';ctx.fillRect(back-(cr.dir>0?0:1.5*sc),cy+1.5*sc,1.5*sc,2*sc)}});
+  // palms
+  ctx.strokeStyle='#0b0907';ctx.fillStyle='#0b0907';
+  S.palms.forEach((p,i)=>{const bx=p.x,by=h,tx=bx+(i%2?-1:1)*14*sc+Math.sin(t*.0008+i)*2*sc,ty=h-p.h;ctx.lineWidth=4*sc;ctx.beginPath();ctx.moveTo(bx,by);ctx.quadraticCurveTo(bx+(i%2?-1:1)*4*sc,(by+ty)/2,tx,ty);ctx.stroke();ctx.lineWidth=2.2*sc;for(let k=0;k<9;k++){const ang=-Math.PI/2+(k-4)*.42+Math.sin(t*.0012+k+i)*.05;const len=(28+(k%3)*6)*sc;const ex=tx+Math.cos(ang)*len,ey=ty+Math.sin(ang)*len*.55+len*.35;ctx.beginPath();ctx.moveTo(tx,ty);ctx.quadraticCurveTo(tx+Math.cos(ang)*len*.5,ty+Math.sin(ang)*len*.5-6*sc,ex,ey);ctx.stroke()}ctx.beginPath();ctx.arc(tx,ty+2*sc,3.2*sc,0,Math.PI*2);ctx.fill()});
+  // power line + grackles
+  const y0=h*.16,y1=h*.22,cpY=h*.3;ctx.strokeStyle='rgba(10,8,6,.85)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(0,y0);ctx.quadraticCurveTo(w/2,cpY,w,y1);ctx.stroke();
+  for(let i=0;i<7;i++){const u=.08+i*.035+(i>3?.25:0);const bx=(1-u)*(1-u)*0+2*(1-u)*u*(w/2)+u*u*w,by=(1-u)*(1-u)*y0+2*(1-u)*u*cpY+u*u*y1;const hop=Math.max(0,Math.sin(t*.003+i*2.1))>.985?-3*sc:0;ctx.fillStyle='#070608';ctx.beginPath();ctx.ellipse(bx,by-3*sc+hop,3.6*sc,2.4*sc,0,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(bx+3*sc,by-5.5*sc+hop,1.7*sc,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.moveTo(bx-3*sc,by-3*sc+hop);ctx.lineTo(bx-9*sc,by+1*sc+hop);ctx.lineTo(bx-7*sc,by-3.5*sc+hop);ctx.fill()}
+  // rain
+  if(ph==='storm'){ctx.strokeStyle='rgba(200,210,215,.35)';ctx.lineWidth=1;ctx.beginPath();for(let i=0;i<140;i++){const x=(i*73.3+t*.25)%(w+60)-30,y=(i*41.7+t*.9)%h;ctx.moveTo(x,y);ctx.lineTo(x-4,y+12)}ctx.stroke()}
+}
+function setScene(canvas,kind,phase,storm){
+  let s=scenes.get(canvas);if(!s){s={cars:[],data:null};scenes.set(canvas,s)}
+  if(s.kind!==kind){s.data=null;s.cars=[]}
+  s.kind=kind;s.phase=phase;s.storm=!!storm;
+  if(REDUCED)drawScene(canvas,s,0);
+}
+function loop(t){scenes.forEach((s,c)=>{if(c.offsetParent!==null)drawScene(c,s,t)});requestAnimationFrame(loop)}
+if(REDUCED)window.addEventListener('resize',()=>scenes.forEach((s,c)=>drawScene(c,s,0)));
+else requestAnimationFrame(loop);
+
+/* ================= MODALS & TOASTS ================= */
+const modalQ=[];let modalOpen=false;
+function showModal(build){modalQ.push(build);if(!modalOpen)nextModal()}
+function nextModal(){const b=modalQ.shift();const m=$('#modal');if(!b){modalOpen=false;m.hidden=true;renderAll();return}modalOpen=true;m.hidden=false;const box=$('#modalBox');box.innerHTML='';box.scrollTop=0;b(box,closeModal);const f=box.querySelector('.btn:not(:disabled)');if(f)f.focus({preventScroll:true})}
+function closeModal(){save();nextModal()}
+function toast(msg,kind){const t=document.createElement('div');t.className='toast '+(kind||'');t.textContent=msg;$('#toasts').append(t);setTimeout(()=>t.remove(),3400)}
+
+/* ================= PROGRESSION ================= */
+function gainXP(n){
+  n=Math.round(n);if(n<=0)return;state.xp+=n;
+  while(state.xp>=need(state.lvl)){state.xp-=need(state.lvl);state.lvl++;state.pts++;state.maxHp+=8;state.hp=state.maxHp;toast(`Level ${state.lvl}! Full health and a stat point to spend.`,'lvl');showModal(levelUpModal)}
+}
+function levelUpModal(box,close){
+  if(state.pts<1){close();return}
+  box.innerHTML=`<div class="eyebrow">Level ${state.lvl}</div><h2>Your name is getting around</h2><p>Put a point into one stat. ${state.pts>1?`You have ${state.pts} points.`:''}</p>
+  <div class="lvlgrid">${Object.keys(STAT_INFO).map(k=>`<button class="btn" data-stat="${k}"><b>${STAT_INFO[k].label} ${state.stats[k]} → ${state.stats[k]+1}</b><small>${STAT_INFO[k].help}</small></button>`).join('')}</div>`;
+  box.querySelectorAll('[data-stat]').forEach(b=>b.onclick=()=>{state.stats[b.dataset.stat]++;state.pts--;if(state.stats.smarts===6&&b.dataset.stat==='smarts')toast('You can hear street rumors now.','good');if(state.pts>0)levelUpModal(box,close);else close()});
+}
+function hurt(n){state.hp=Math.max(1,state.hp-n)}
+function addInv(id,q,unit){const have=state.inv[id]||0;state.avg[id]=Math.round(((state.avg[id]||0)*have+unit*q)/(have+q));state.inv[id]=have+q}
+function loseStash(frac){const keys=Object.keys(state.inv).filter(k=>state.inv[k]>0);if(!keys.length)return 'nothing (trunk was empty)';const k=pick(keys);const q=Math.max(1,Math.round(state.inv[k]*frac));state.inv[k]-=q;if(state.inv[k]<=0){delete state.inv[k];delete state.avg[k]}return `${q} ${G(k).name}`}
+function addHeat(n){state.heat=clamp(state.heat+n,0,100)}
+
+/* ================= DAY / TRAVEL ================= */
+function advanceDay(){
+  state.day++;
+  if(state.day>state.maxDay){endGame();return false}
+  state.debt=Math.round(state.debt*1.10);
+  state.bank=Math.round(state.bank*1.03);
+  state.heat=Math.max(0,state.heat*.85-2);
+  if(state.crew.length){const wages=state.crew.length*120;if(state.cash>=wages)state.cash-=wages;else{const q=state.crew.pop();pushNews(`${q.name} walked off. You couldn't make payroll.`)}}
+  state.today=state.tomorrow;
+  state.tomorrow=[genEvent()].concat(chance(.55)?[genEvent()]:[]);state.tomorrow.forEach(e=>e.txt=eventText(e));
+  if(state.storm>0){state.storm--;if(!state.storm)pushNews(`${state.stormName} moves inland. Water going down on the bayous.`)}
+  else if(state.day>3&&chance(.06)){state.storm=2;state.stormName=pick(STORMS);pushNews(`${state.stormName} parks over Houston. Underpasses flooding all over town.`)}
+  if(chance(.6))pushNews(pick(FLAVOR));
+  return true;
+}
+function gasCost(a,b){return Math.round(Math.hypot(a.x-b.x,a.y-b.y)*1.6)+8}
+function travel(id){
+  if(state.over||modalOpen||id===state.loc)return;
+  const a=D(state.loc),b=D(id);const gas=gasCost(a,b);
+  state.cash=Math.max(0,state.cash-gas);
+  const road=pick(ROADS);
+  if(!advanceDay())return;
+  state.loc=id;genPrices();
+  if(state.event)pushNews(state.event.text,state.event.up?'':'');
+  tripEvents(road);
+  if(state.day===state.maxDay)showModal((box,close)=>{box.innerHTML=`<div class="eyebrow">Day ${state.day} of ${state.maxDay}</div><h2>Last day in the city</h2><p>Sell what you're holding and settle up with Uncle Dollar. When you leave ${esc(b.name)}, the run ends and only cash, bank and debt count.</p><div class="mfoot"><button class="btn go" id="ok">Got it</button></div>`;box.querySelector('#ok').onclick=close});
+  save();renderAll();
+}
+function tripEvents(road){
+  const p=.13+state.heat/220-(state.gear.scanner?.06:0)-state.stats.smarts*.006;
+  if(state.debt>15000&&state.loc!=='fifth'&&chance(.22)){startCombat('enforcers',road);return}
+  if(chance(p)){const cop=chance(.35+state.heat/200);startCombat(cop?(chance(.65)?'cops':'constables'):(chance(.5)?'crew':'jackers'),road);return}
+  if(state.storm>0&&chance(.45)){runStory(STORIES[1],road);return}
+  if(chance(.3))runStory(pick(STORIES),road);
+}
+
+/* ================= STORIES ================= */
+const STORIES=[
+  road=>{const g=pick(GOODS.filter(x=>x.max<6000));const q=rnd(8,24);const unit=Math.round(g.min*.55);const tot=unit*q;
+    return {eye:'Gas station on Scott St',title:'Trunk sale',body:`A man in a Grand Marquis pops his trunk: ${q} ${g.name} for ${money(tot)}. That's way under street price.`,
+      choices:[{label:`Buy all ${q} for ${money(tot)}`,ok:state.cash>=tot&&free()>=q,fn:()=>{if(chance(.26-state.stats.smarts*.025))return{text:'It was a sting. An unmarked Tahoe boxes you in before the trunk closes.',then:()=>startCombat('cops','Scott St')};state.cash-=tot;addInv(g.id,q,unit);addHeat(4*heatMult());gainXP(10);return{text:`Done. ${q} ${g.name} in the trunk at ${money(unit)} each.`}}},
+               {label:'Keep driving',fn:()=>({text:'Too clean. You leave it.'})}]}},
+  road=>({eye:`Underpass on ${road}`,title:'High water',body:'The underpass is under two feet of brown water. A stalled Camry floats near the middle. Everybody behind you is honking.',
+      choices:[{label:`Gun it through · Driving check`,fn:()=>{if(chance(.32+state.stats.drive*.07+CARS[state.car].run)){gainXP(25);return{text:'Water over the hood for one long second, then you are out the other side. +25 XP.'}}const lost=loseStash(.25);hurt(8);return{text:`The engine stalls in the middle. You push it out, soaked, and lose ${lost} to the water. −8 HP.`}}},
+               {label:'Take the feeder road · −$180',fn:()=>{state.cash=Math.max(0,state.cash-180);return{text:'Forty minutes of brake lights. A tow driver charges you anyway for "standing by."'}}}]}),
+  ()=>({eye:'Barbershop on Almeda',title:'The old head in the third chair',body:'An old man who ran these streets in the 90s looks at you over his newspaper. "I could tell you some things. Cost you, though."',
+      choices:[{label:'Pay $900 to listen · +1 Smarts',ok:state.cash>=900,fn:()=>{state.cash-=900;state.stats.smarts++;return{text:'He talks for an hour. Half of it is about the Oilers. The other half is gold. +1 Smarts.'}}},
+               {label:'Just get a lineup · −$30',ok:state.cash>=30,fn:()=>{state.cash-=30;addHeat(-6);state.hp=Math.min(state.maxHp,state.hp+5);return{text:'Fresh lineup. You look like a different person, and a cruiser drives right past. −6 heat.'}}}]}),
+  ()=>{const g=pick(GOODS.filter(x=>x.max<6000));const q=rnd(4,12);return {eye:'Brays Bayou trail',title:'Duffel in the weeds',body:'A duffel bag snagged on the bank, half buried in mud. You can see packaging through a tear.',
+      choices:[{label:`Take it · +${q} ${g.name}`,ok:free()>=q,fn:()=>{addInv(g.id,q,0);addHeat(12*heatMult());gainXP(8);return{text:`Somebody is missing ${q} ${g.name}. Somebody is going to look for it. +12 heat.`}}},
+               {label:'Leave it',fn:()=>({text:"Not your bag, not your problem."})}]}},
+  ()=>({eye:'Church lot, Third Ward',title:'Saturday fish fry',body:'Catfish, white bread, hot sauce. The pastor knows exactly who you are and smiles anyway.',
+      choices:[{label:'Donate $250',ok:state.cash>=250,fn:()=>{state.cash-=250;addHeat(-22);gainXP(12);return{text:'The neighborhood will vouch for you now. −22 heat, +12 XP.'}}},
+               {label:'Grab a plate and go · −$12',ok:state.cash>=12,fn:()=>{state.cash-=12;state.hp=Math.min(state.maxHp,state.hp+10);return{text:'Best catfish in the city. +10 HP.'}}}]}),
+  ()=>({eye:'Parking lot, Sunnyside',title:'Screw tape session',body:'Somebody is playing an old gray tape out of a trunk, slowed way down. Everybody is leaning on cars, easy.',
+      choices:[{label:'Stay a while',fn:()=>{state.hp=Math.min(state.maxHp,state.hp+18);gainXP(6);return{text:'The city slows down for an hour. +18 HP.'}}},
+               {label:'Keep moving',fn:()=>({text:'Money doesn\'t wait.'})}]}),
+  road=>({eye:`Shoulder of ${road}`,title:'Wrecker shakedown',body:'A tow truck boxes you in. The driver leans in your window: "$400 or I make a phone call about what\'s in that trunk."',
+      choices:[{label:'Pay $400',ok:state.cash>=400,fn:()=>{state.cash-=400;return{text:'He pockets it and pulls off with a wave.'}}},
+               {label:'Tell him to try it',fn:()=>({text:'He whistles. Two more guys climb out of the cab.',then:()=>startCombat('jackers',road)})}]}),
+  ()=>({eye:'Taco truck on Long Point',title:'2 a.m. al pastor',body:'Line of six people. Smells like charred pineapple and diesel.',
+      choices:[{label:'Get three · −$9',ok:state.cash>=9,fn:()=>{state.cash-=9;state.hp=Math.min(state.maxHp,state.hp+12);return{text:'Perfect. +12 HP.'}}},
+               {label:'Skip it',fn:()=>({text:'You regret it the whole drive.'})}]}),
+];
+function runStory(fn,road){
+  const st=fn(road);
+  showModal((box,close)=>{
+    box.innerHTML=`<div class="eyebrow">${esc(st.eye)}</div><h2>${esc(st.title)}</h2><p>${esc(st.body)}</p><div class="choices">${st.choices.map((c,i)=>`<button class="btn" data-i="${i}" ${c.ok===false?'disabled':''}>${esc(c.label)}</button>`).join('')}</div>`;
+    box.querySelectorAll('[data-i]').forEach(b=>b.onclick=()=>{const res=st.choices[+b.dataset.i].fn()||{};
+      box.innerHTML=`<div class="eyebrow">${esc(st.eye)}</div><h2>${esc(st.title)}</h2><div class="outcome">${esc(res.text||'')}</div><div class="mfoot" style="margin-top:16px"><button class="btn go" id="ok">Continue</button></div>`;
+      box.querySelector('#ok').onclick=()=>{if(res.then)res.then();close()};box.querySelector('#ok').focus()});
+  });
+}
+
+/* ================= COMBAT ================= */
+function startCombat(kind,road){
+  const F=FOES[kind];const scale=1+state.day/28;const n=rnd(F.count[0],F.count[1]);
+  const foes=Array.from({length:n},(_,i)=>{const hp=Math.round(rnd(F.hp[0],F.hp[1])*scale);return{i,hp,max:hp,look:F.look()}});
+  const cb={kind,F,foes,scale,log:[F.intro],done:null,fx:[],road:road||pick(ROADS)};
+  state.record.fights++;
+  showModal((box,close)=>{cb.box=box;cb.close=close;renderCombat(cb)});
+}
+function alive(cb){return cb.foes.filter(f=>f.hp>0)}
+function bribeCost(cb){return Math.round((300+state.day*60)*alive(cb).length*Math.max(.5,1-state.stats.charm*.03))}
+function runChance(cb){return clamp(.28+state.stats.drive*.05+CARS[state.car].run+(state.cid==='swang'?.2:0)+(state.gear.tint?.15:0)-alive(cb).length*.04,.05,.92)}
+function renderCombat(cb){
+  const box=cb.box,F=cb.F;const me=CH();
+  const isCop=cb.kind==='cops'||cb.kind==='constables';
+  let acts='';
+  if(!cb.done){
+    const rc=Math.round(runChance(cb)*100);
+    acts=`<button class="btn danger" data-c="fight">Fight<small>${esc(WEAPONS[state.weapon].name)}${state.crew.length?` + ${state.crew.length} crew`:''}</small></button>
+    <button class="btn" data-c="run">Run<small>${rc}% to lose them</small></button>`;
+    if(isCop){const bc=bribeCost(cb);acts+=`<button class="btn" data-c="talk" ${state.cash<bc?'disabled':''}>Bribe ${money(bc)}<small>${Math.round(clamp(.45+state.stats.charm*.05,0,.95)*100)}% he takes it</small></button>
+      <button class="btn" data-c="dump" ${used()<1?'disabled':''}>Toss the stash<small>Lose everything, walk free</small></button>`}
+    else if(cb.kind==='enforcers'){const pay=Math.min(state.cash,Math.round(state.debt*.3));acts+=`<button class="btn" data-c="pay" ${pay<state.debt*.2?'disabled':''}>Pay ${money(pay)}<small>Toward the debt</small></button>`}
+    else acts+=`<button class="btn" data-c="talk">Talk it down<small>${Math.round(clamp(.25+state.stats.charm*.04+state.stats.grit*.03,0,.9)*100)}% chance</small></button>`;
+  }
+  box.innerHTML=`<div class="eyebrow">${esc(cb.road)} · Day ${state.day}</div><h2>${esc(F.name)}</h2>
+  <div class="foes">${cb.foes.map(f=>`<div class="foe ${f.hp<=0?'dead':''}" data-f="${f.i}">${portrait(f.look)}<div class="hpb"><b style="width:${Math.max(0,f.hp/f.max*100)}%"></b></div><small>${f.hp<=0?'Down':`${f.hp} HP`}</small></div>`).join('')}</div>
+  <div class="vs" id="vsMe">${portrait(me.look)}<div class="grow"><div class="me-top"><b style="font:400 15px var(--f-display)">${esc(me.short)}</b><span class="lvl">LV ${state.lvl}</span></div>
+    <div class="bar hp"><span>HP</span><i><b style="width:${state.hp/state.maxHp*100}%"></b></i><span class="v">${state.hp}/${state.maxHp}</span></div>
+    ${state.crew.length?`<div class="crewchips">${state.crew.map(c=>`<span>${esc(c.name)} +${c.pow}</span>`).join('')}</div>`:''}</div></div>
+  <div class="clog">${cb.log.slice(-5).map(l=>`<div>${esc(l)}</div>`).join('')}</div>
+  ${cb.done?`<div class="outcome">${esc(cb.done)}</div><div class="mfoot" style="margin-top:14px"><button class="btn go" id="cdone">Continue</button></div>`:`<div class="cacts">${acts}</div>`}`;
+  cb.fx.forEach(fx=>{const el=fx.me?box.querySelector('#vsMe'):box.querySelector(`[data-f="${fx.i}"]`);if(!el)return;el.classList.add('hit');const d=document.createElement('span');d.className='dmg'+(fx.me?' me':'');d.textContent=fx.miss?'miss':'-'+fx.d;el.append(d)});
+  cb.fx=[];
+  box.querySelectorAll('[data-c]').forEach(b=>b.onclick=()=>combatAct(cb,b.dataset.c));
+  const dn=box.querySelector('#cdone');if(dn){dn.onclick=()=>{const after=cb.after;cb.close();if(after)after()};dn.focus()}
+}
+function playerAttack(cb){
+  const W=WEAPONS[state.weapon];
+  let d=rnd(2,5)+rnd(W.dmg[0],W.dmg[1])+Math.round(state.stats.grit*1.3);
+  if(state.cid==='deacon')d=Math.round(d*1.25);
+  const crit=chance(.08+state.stats.smarts*.012);if(crit)d=Math.round(d*1.8);
+  const tgt=alive(cb)[0];
+  if(chance(.62+state.stats.grit*.025)){tgt.hp-=d;cb.log.push(`You hit the ${cb.F.who} for ${d}${crit?'. Critical.':'.'}`);cb.fx.push({i:tgt.i,d})}
+  else{cb.log.push('You swing and miss.');cb.fx.push({i:tgt.i,miss:true})}
+  state.crew.forEach(c=>{const al=alive(cb);if(!al.length)return;const t=pick(al);if(chance(.6)){const cd=rnd(2,6)+c.pow;t.hp-=cd;cb.log.push(`${c.name} hits for ${cd}.`);cb.fx.push({i:t.i,d:cd})}});
+}
+function foesAttack(cb){
+  let total=0;
+  alive(cb).forEach(()=>{if(chance(.5-state.stats.drive*.012)){let d=rnd(cb.F.dmg[0],cb.F.dmg[1])*cb.scale;if(state.gear.vest)d*=.65;d=Math.max(1,Math.round(d));state.hp-=d;total+=d;cb.log.push(`A ${cb.F.who} hits you for ${d}.`)}else cb.log.push(`A ${cb.F.who} misses.`)});
+  if(total)cb.fx.push({me:true,d:total});
+}
+function combatAct(cb,a){
+  const F=cb.F;const isCop=cb.kind==='cops'||cb.kind==='constables';
+  if(a==='fight'){playerAttack(cb);if(alive(cb).length)foesAttack(cb)}
+  else if(a==='run'){if(chance(runChance(cb))){finishCombat(cb,'escape');return}cb.log.push(`You floor it down ${cb.road}. They stay on you.`);foesAttack(cb)}
+  else if(a==='talk'){
+    if(isCop){const bc=bribeCost(cb);if(chance(clamp(.45+state.stats.charm*.05,0,.95))){state.cash-=bc;finishCombat(cb,'bribe',bc);return}cb.log.push('"You trying to bribe me?" Wrong cop.');addHeat(6);foesAttack(cb)}
+    else{if(chance(clamp(.25+state.stats.charm*.04+state.stats.grit*.03,0,.9))){finishCombat(cb,'talk');return}cb.log.push('They laugh at you.');foesAttack(cb)}
+  }
+  else if(a==='dump'){state.inv={};state.avg={};finishCombat(cb,'dump');return}
+  else if(a==='pay'){const pay=Math.min(state.cash,Math.round(state.debt*.3));state.cash-=pay;state.debt-=pay;finishCombat(cb,'pay',pay);return}
+  if(!alive(cb).length){finishCombat(cb,'win');return}
+  if(state.hp<=0){finishCombat(cb,'lose');return}
+  renderCombat(cb);
+}
+function finishCombat(cb,how,amt){
+  const F=cb.F;const isCop=cb.kind==='cops'||cb.kind==='constables';const n=cb.foes.length;
+  if(how==='win'){
+    state.record.won++;const loot=F.loot[1]?rnd(F.loot[0],F.loot[1])*n:0;state.cash+=loot;
+    if(isCop)addHeat(25*heatMult());
+    cb.done=isCop?`You leave ${n>1?'them':'him'} on the shoulder and disappear into traffic. That's going to follow you. +25 heat.`:`They scatter.${loot?` You pick up ${money(loot)} they dropped.`:''}`;
+    if(cb.kind==='enforcers'){cb.done='You put both of them down. Uncle Dollar will remember this, and the debt is still there.';addHeat(8)}
+    cb.after=()=>gainXP(F.xp*n);
+  }else if(how==='escape'){cb.done=`You cut across three lanes and take the next exit. Gone.`;cb.after=()=>gainXP(6)}
+  else if(how==='bribe'){cb.done=`He folds the ${money(amt)} into his notebook and tells you to drive safe.`;addHeat(-5)}
+  else if(how==='talk'){cb.done='You talk fast and keep your hands where they can see them. They let it go.';cb.after=()=>gainXP(8)}
+  else if(how==='dump'){cb.done='You toss everything out the window on a curve. They find nothing in the car. "Get out of here."';addHeat(-10)}
+  else if(how==='pay'){cb.done=`You hand over ${money(amt)}. "He'll be glad to hear it." They get back in the Escalade.`}
+  else if(how==='lose'){
+    const lostCash=Math.round(state.cash*.4);state.cash-=lostCash;state.inv={};state.avg={};state.hp=Math.round(state.maxHp*.3);
+    let quit='';if(state.crew.length&&chance(.4)){const q=state.crew.splice(rnd(0,state.crew.length-1),1)[0];quit=` ${q.name} got picked up and isn't coming back.`}
+    if(isCop){cb.done=`Booked at 1200 Baker Street. Bail eats ${money(lostCash)}, the stash goes to evidence, and you lose a day.${quit}`;addHeat(-20);cb.after=()=>{if(advanceDay()){genPrices();save();renderAll()}}}
+    else cb.done=`You wake up on the pavement. They took the stash and ${money(lostCash)}.${quit}`;
+  }
+  renderCombat(cb);
+}
+
+/* ================= TRADING ================= */
+function maxBuy(id){const p=state.prices[id];if(!p)return 0;const unit=Math.round(p*priceMods().b);return Math.min(Math.floor(state.cash/unit),free())}
+function openTrade(id,mode){
+  const g=G(id);const p=state.prices[id];if(!p)return;
+  const unit=Math.round(p*(mode==='buy'?priceMods().b:priceMods().s));
+  const max=mode==='buy'?maxBuy(id):(state.inv[id]||0);if(max<1)return;
+  showModal((box,close)=>{
+    const avg=state.avg[id]||0;
+    box.innerHTML=`<div class="eyebrow">${mode==='buy'?'Buying':'Selling'} in ${esc(D(state.loc).name)}</div><h2>${esc(g.name)} at ${money(unit)}</h2>
+    <p style="color:var(--dust);font-size:14px">${mode==='buy'?`You can afford and carry up to ${max}.`:`You're holding ${max}, bought at ${money(avg)} on average.`}</p>
+    <input type="range" id="tq" min="1" max="${max}" value="${max}" aria-label="Quantity">
+    <div class="qtyrow">${[1,10,'half','max'].map(q=>`<button class="btn sm" data-q="${q}">${q==='half'?'Half':q==='max'?'Max':q}</button>`).join('')}</div>
+    <div class="tot"><div><span id="tqn"></span></div><b id="ttot"></b></div>
+    <div class="mfoot"><button class="btn" id="tc">Cancel</button><button class="btn ${mode==='buy'?'buy':'sell'}" id="tgo">${mode==='buy'?'Buy':'Sell'}</button></div>`;
+    const r=box.querySelector('#tq');
+    const upd=()=>{const q=+r.value;box.querySelector('#tqn').textContent=`${q} × ${money(unit)}`;const t=box.querySelector('#ttot');t.textContent=money(q*unit);if(mode==='sell'){const pl=(unit-avg)*q;t.innerHTML=`${money(q*unit)} <small class="${pl>=0?'up':'down'}" style="font-size:13px">${pl>=0?'+':''}${money(pl)}</small>`}};
+    r.oninput=upd;upd();
+    box.querySelectorAll('[data-q]').forEach(b=>b.onclick=()=>{const q=b.dataset.q;r.value=q==='max'?max:q==='half'?Math.max(1,Math.floor(max/2)):Math.min(max,+q);upd()});
+    box.querySelector('#tc').onclick=close;
+    box.querySelector('#tgo').onclick=()=>{const q=+r.value;
+      if(mode==='buy'){state.cash-=q*unit;addInv(id,q,unit);addHeat(Math.min(15,q*unit/1500)*heatMult());gainXP(2);toast(`Bought ${q} ${g.name} for ${money(q*unit)}.`)}
+      else{const profit=(unit-avg)*q;state.cash+=q*unit;state.inv[id]-=q;if(state.inv[id]<=0){delete state.inv[id];delete state.avg[id]}addHeat(Math.min(12,q*unit/2000)*heatMult());state.record.sold+=q*unit;if(profit>state.record.best)state.record.best=profit;gainXP(2+Math.max(0,profit)/40);toast(`Sold ${q} ${g.name}. ${profit>=0?'Profit':'Loss'}: ${money(profit)}.`,profit>=0?'good':'bad')}
+      close()};
+  });
+}
+
+/* ================= END ================= */
+function rankOf(net){if(net<0)return'Owned by Uncle Dollar';if(net<10000)return'Corner Boy';if(net<50000)return'Block Captain';if(net<150000)return'Southside Supplier';if(net<500000)return'Ward Boss';return'King of the Bayou City'}
+function endGame(){
+  state.over=true;state.day=Math.min(state.day,state.maxDay);
+  const net=state.cash+state.bank-state.debt;clearSave();
+  showModal((box)=>{
+    box.innerHTML=`<div class="eyebrow">Final tally · ${esc(CH().name)}</div><h2>${esc(rankOf(net))}</h2>
+    <div class="big-num ${net>=0?'up':'down'}">${money(net)}</div><p style="color:var(--dust)">Net worth: cash plus bank, minus what you still owe.</p>
+    <dl class="kv"><dt>Cash</dt><dd>${money(state.cash)}</dd><dt>Bank</dt><dd>${money(state.bank)}</dd><dt>Owed to Uncle Dollar</dt><dd>${money(state.debt)}</dd><dt>Level reached</dt><dd>${state.lvl}</dd><dt>Best single sale</dt><dd>${money(state.record.best)}</dd><dt>Fights won</dt><dd>${state.record.won} of ${state.record.fights}</dd><dt>Ride</dt><dd>${esc(CARS[state.car].name)}</dd></dl>
+    <div class="mfoot"><button class="btn go" id="again">Run it back</button></div>`;
+    box.querySelector('#again').onclick=()=>{modalQ.length=0;modalOpen=false;$('#modal').hidden=true;state=null;showStart()};
+  });
+}
+
+/* ================= RENDER ================= */
+function bar(cls,label,val,max,txt){return `<div class="bar ${cls}"><span>${label}</span><i><b style="width:${clamp(val/max*100,0,100)}%"></b></i><span class="v">${txt}</span></div>`}
+function renderAll(){if(!state||$('#game').hidden)return;renderHUD();renderMarket();renderTabs()}
+function renderHUD(){
+  const d=D(state.loc);const ph=phaseOf(state.day);
+  $('#hDay').textContent=`${state.day} / ${state.maxDay}`;
+  $('#hCash').textContent=money(state.cash);$('#hBank').textContent=money(state.bank);$('#hDebt').textContent=money(state.debt);
+  $('#hCap').textContent=`${used()} / ${cap()}`;
+  $('#sTime').textContent=`Day ${state.day} · ${state.storm?esc(state.stormName):ph[0].toUpperCase()+ph.slice(1)}`;
+  $('#sLoc').textContent=d.name;$('#sTag').textContent=d.tag;
+  const C=CH();
+  $('#me').innerHTML=`${portrait(C.look)}<div class="me-body"><div class="me-top"><b>${esc(C.short)}</b><span class="lvl">LV ${state.lvl}${state.pts?`<button class="pts-pill" data-act="spend">+${state.pts} pt</button>`:''}</span></div>
+  ${bar('hp','HP',state.hp,state.maxHp,`${state.hp}/${state.maxHp}`)}${bar('xp','XP',state.xp,need(state.lvl),`${state.xp}/${need(state.lvl)}`)}${bar('heat','Heat',state.heat,100,`${Math.round(state.heat)}`)}</div>`;
+  setScene($('#sceneSky'),d.sky,ph,state.storm>0);
+  const items=state.news.map(n=>`<span class="${n.cls}">${esc(n.t)}</span>`);
+  if(hearsRumors()&&state.tomorrow[0])items.unshift(`<span class="rumor">Word for tomorrow: ${esc(state.tomorrow[0].txt)}</span>`);
+  $('#ticker').innerHTML=items.join('')+items.join('');
+}
+function renderMarket(){
+  const d=D(state.loc);const m=priceMods();
+  $('#mTitle').textContent=`Street prices · ${d.name}`;
+  $('#mCap').innerHTML=`Trunk <b>${used()}</b> / ${cap()} · <b>${free()}</b> free`;
+  $('#report').innerHTML=state.event?`<div class="report ${state.event.up?'up':'down'}"><strong>Street report</strong><span>${esc(state.event.text)}</span></div>`:'';
+  const head=`<div class="mrow mhead"><div>Product</div><div>Cheap ↔ High</div><div class="r">Buy</div><div class="r">Sell</div><div class="r">Held</div><div></div></div>`;
+  $('#market').innerHTML=head+GOODS.map(g=>{
+    const p=state.prices[g.id];const own=state.inv[g.id]||0;
+    if(p==null)return `<div class="mrow off"><div class="gname"><b>${g.name}</b><span>${g.desc}</span></div><div class="nobody">Nobody's holding ${g.name.toLowerCase()} here today</div><div class="num own"><label>Held</label>${own||'—'}</div></div>`;
+    const buy=Math.round(p*m.b),sell=Math.round(p*m.s);const pos=clamp((p-g.min)/(g.max-g.min),0,1);
+    const tag=p<g.min*.8?'<i class="tag steal">Steal</i>':p>g.max*1.2?'<i class="tag hot">Spiking</i>':'';
+    const pl=own?sell-state.avg[g.id]:0;
+    return `<div class="mrow"><div class="gname"><b>${g.name}</b>${tag}<span>${g.desc}</span></div>
+      <div class="gauge" title="Where today's price sits in the usual range"><span style="left:${pos*100}%"></span></div>
+      <div class="num buyp"><label>Buy</label>${money(buy)}</div><div class="num sellp"><label>Sell</label>${money(sell)}</div>
+      <div class="num own"><label>Held</label>${own||'—'}${own?`<small class="${pl>=0?'up':'down'}">paid ${money(state.avg[g.id])}</small>`:''}</div>
+      <div class="acts"><button class="btn buy" data-buy="${g.id}" ${maxBuy(g.id)<1?'disabled':''}>Buy</button><button class="btn sell" data-sell="${g.id}" ${own<1?'disabled':''}>Sell</button></div></div>`;
+  }).join('');
+}
+function renderTabs(){
+  const d=D(state.loc);const svc=SERVICES[d.svc];
+  const tabs=[['map','Map'],['spot',svc.tab],['stash','Stash'],['me','Hustler']];
+  $('#tabs').innerHTML=tabs.map(([k,l])=>`<button role="tab" data-tab="${k}" aria-selected="${tab===k}">${l}${k==='me'&&state.pts?'<span class="dot"></span>':''}</button>`).join('');
+  const body=$('#tabBody');
+  if(tab==='map')body.innerHTML=renderMap();
+  else if(tab==='spot')body.innerHTML=renderSpot(d.svc);
+  else if(tab==='stash')body.innerHTML=renderStash();
+  else body.innerHTML=renderMe();
+}
+function renderMap(){
+  const here=D(state.loc);
+  const nodes=DISTRICTS.map(d=>{const lx=d.x>70?-1:1;return `<g class="d ${d.id===state.loc?'here':''}" data-go="${d.id}" tabindex="0" role="button" aria-label="Drive to ${d.name}">${d.id===state.loc?`<circle class="ring" cx="${d.x}" cy="${d.y}" r="2.6"/>`:''}<circle cx="${d.x}" cy="${d.y}" r="2.6"/><text x="${d.x+(lx>0?4:-4)}" y="${d.y+1.1}" text-anchor="${lx>0?'start':'end'}">${d.name}</text></g>`}).join('');
+  const last=state.day===state.maxDay;
+  return `<svg class="map" viewBox="0 0 100 92" role="img" aria-label="Map of Houston">
+  <ellipse cx="50" cy="48" rx="46" ry="42" class="belt"/><ellipse cx="47" cy="47" rx="21" ry="19" class="loop"/>
+  <path class="fwy" d="M30 0 L52 43 L68 76 L78 92"/><path class="fwy" d="M0 39 L100 37"/><path class="fwy" d="M8 86 L50 45 L78 0"/><path class="fwy" d="M54 45 L56 92"/><path class="fwy" d="M64 52 L100 66"/>
+  <path class="bayou" d="M0 47 C14 43 24 50 36 46 S48 41 55 44 S68 50 78 55 S92 62 100 63"/>
+  <text class="lbl" x="23.5" y="38">610</text><text class="lbl" x="33" y="6">I-45</text><text class="lbl" x="2" y="37.5">I-10</text><text class="lbl" x="10" y="82">59</text><text class="lbl" x="57" y="90">288</text><text class="lbl" x="90" y="63">225</text><text class="lbl" x="86" y="58" style="fill:#2c5a52">Ship Channel</text><text class="lbl" x="5" y="51" style="fill:#2c5a52">Buffalo Bayou</text>
+  ${nodes}</svg>
+  ${last?`<div class="lastday">Last day. Any drive ends the run. <button class="btn go sm" data-act="cashout" style="margin-left:6px">Cash out now</button></div>`:''}
+  <div class="dests">${DISTRICTS.filter(d=>d.id!==state.loc).map(d=>`<button class="dest" data-go="${d.id}"><b>${d.name}</b><small>${SERVICES[d.svc].tab}: ${esc(SERVICES[d.svc].name)}</small><span class="gas">${money(gasCost(here,d))} gas<br>1 day</span></button>`).join('')}</div>`;
+}
+function renderSpot(k){
+  const S=SERVICES[k];let h=`<h3>${esc(S.name)}</h3><p class="blurb">${esc(S.blurb)}</p>`;
+  if(k==='bank'){
+    h+=`<dl class="kv"><dt>In the bank</dt><dd>${money(state.bank)}</dd><dt>Cash on hand</dt><dd>${money(state.cash)}</dd></dl>
+    <div class="row"><input class="amt" id="amt" type="number" min="0" step="100" value="${state.cash}" aria-label="Amount"><button class="btn buy" data-act="dep">Deposit</button><button class="btn sell" data-act="wd">Withdraw</button></div>
+    <div class="row" style="margin-top:8px"><button class="btn sm" data-act="depAll">Deposit all</button><button class="btn sm" data-act="wdAll">Withdraw all</button></div>`;
+  }else if(k==='shark'){
+    const lim=maxDebt();
+    h+=`<dl class="kv"><dt>You owe</dt><dd class="down">${money(state.debt)}</dd><dt>Tomorrow it'll be</dt><dd>${money(state.debt*1.1)}</dd><dt>He'll lend you up to</dt><dd>${money(lim)} total</dd></dl>
+    <div class="row"><input class="amt" id="amt" type="number" min="0" step="100" value="${Math.min(state.cash,state.debt)}" aria-label="Amount"><button class="btn buy" data-act="pay">Pay back</button><button class="btn danger" data-act="borrow">Borrow</button></div>
+    <div class="row" style="margin-top:8px"><button class="btn sm go" data-act="payAll" ${state.debt<1||state.cash<1?'disabled':''}>Pay all you can</button></div>`;
+  }else if(k==='crew'){
+    const key=state.day+'-'+state.loc;
+    if(state.hiresKey!==key){state.hiresKey=key;state.hires=Array.from({length:3},()=>{const pow=rnd(2,6)+Math.floor(state.lvl/3);return{name:pick(CREW_NAMES),pow,cost:pow*1100+rnd(0,600),look:{skin:pick(SKINS),hair:pick(['waves','bun','bald','cap','braids']),hairC:pick(['#141010','#2b1a10','#3a2a1a']),shirt:pick(['#3a5a7a','#7a3a3a','#4a6a3a','#6a4a2a','#2a2a2a']),acc:pick([['chain'],['hoops'],[],['shades'],['beard']]),bg:['#1c1712','#4a3d2f']}}})}
+    h+=`<div class="sect">Looking for work · ${state.crew.length}/3 hired</div><div class="list">${state.hires.map((c,i)=>`<div class="li"><div class="who">${portrait(c.look)}<div><b>${esc(c.name)}</b><small>Muscle +${c.pow} · +15 trunk</small></div></div><button class="btn sm buy" data-act="hire:${i}" ${state.cash<c.cost||state.crew.length>=3?'disabled':''}>Hire ${money(c.cost)}</button></div>`).join('')}</div>`;
+    if(state.crew.length)h+=`<div class="sect">Your crew</div><div class="list">${state.crew.map((c,i)=>`<div class="li owned"><div class="who">${portrait(c.look)}<div><b>${esc(c.name)}</b><small>Muscle +${c.pow}</small></div></div><button class="btn sm" data-act="fire:${i}">Let go</button></div>`).join('')}</div>`;
+  }else if(k==='clinic'){
+    const miss=state.maxHp-state.hp;
+    h+=`<dl class="kv"><dt>Health</dt><dd>${state.hp} / ${state.maxHp}</dd><dt>Full patch-up</dt><dd>${money(miss*25)}</dd></dl>
+    <div class="row"><button class="btn buy" data-act="heal10" ${miss<1||state.cash<25?'disabled':''}>Patch 10 HP · ${money(Math.min(10,miss)*25)}</button><button class="btn go" data-act="healAll" ${miss<1||state.cash<25?'disabled':''}>Patch what I can afford</button></div>`;
+  }else if(k==='boutique'||k==='plug'){
+    h+=`<div class="list">${ITEMS[k].map(it=>`<div class="li ${state.gear[it.key]?'owned':''}"><div><b>${esc(it.name)}</b><small>${esc(it.desc)}</small></div>${state.gear[it.key]?'<span class="p">Owned</span>':`<button class="btn sm buy" data-act="item:${k}:${it.key}" ${state.cash<it.price?'disabled':''}>${money(it.price)}</button>`}</div>`).join('')}</div>`;
+  }else if(k==='garage'){
+    const trade=Math.round(CARS[state.car].price/2);
+    h+=`<div class="list">${CARS.map((c,i)=>{const cost=c.price-trade;const own=i===state.car;return `<div class="li ${own?'owned':''}"><div><b>${esc(c.name)}</b><small>${c.cap} trunk${c.run?` · +${Math.round(c.run*100)}% escape`:''} · ${esc(c.desc)}</small></div>${own?'<span class="p">Driving</span>':i<state.car?'<span class="p" style="color:var(--dust)">—</span>':`<button class="btn sm buy" data-act="car:${i}" ${state.cash<cost?'disabled':''}>${money(cost)}</button>`}</div>`}).join('')}</div>`;
+  }else if(k==='arms'){
+    h+=`<div class="list">${WEAPONS.map((w,i)=>`<div class="li ${i===state.weapon?'owned':''}"><div><b>${esc(w.name)}</b><small>${w.dmg[1]?`+${w.dmg[0]}–${w.dmg[1]} damage`:'Whatever Grit gives you'}</small></div>${i===state.weapon?'<span class="p">Carrying</span>':i<state.weapon||!w.price?'<span class="p" style="color:var(--dust)">—</span>':`<button class="btn sm buy" data-act="wpn:${i}" ${state.cash<w.price?'disabled':''}>${money(w.price)}</button>`}</div>`).join('')}</div>`;
+  }
+  return h;
+}
+function maxDebt(){return 25000+state.lvl*6000}
+function renderStash(){
+  const keys=Object.keys(state.inv).filter(k=>state.inv[k]>0);
+  let h=`<div class="sect">In the trunk · ${used()}/${cap()}</div>`;
+  h+=keys.length?`<div class="list">${keys.map(k=>{const g=G(k);const p=state.prices[k];const sell=p?Math.round(p*priceMods().s):null;const pl=sell!=null?(sell-state.avg[k])*state.inv[k]:null;return `<div class="li"><div><b>${state.inv[k]} ${esc(g.name)}</b><small>Paid ${money(state.avg[k])} each${sell!=null?` · sells for ${money(sell)} here`:' · no buyers here today'}</small></div><span class="p ${pl==null?'':pl>=0?'up':'down'}">${pl==null?'—':(pl>=0?'+':'')+money(pl)}</span></div>`}).join('')}</div>`:`<p class="blurb">Trunk's empty. Find something cheap.</p>`;
+  h+=`<div class="sect">Gear</div><div class="list">
+    <div class="li"><div><b>${esc(CARS[state.car].name)}</b><small>Ride · ${CARS[state.car].cap} trunk</small></div></div>
+    <div class="li"><div><b>${esc(WEAPONS[state.weapon].name)}</b><small>Weapon</small></div></div>
+    ${Object.values(ITEMS).flat().filter(it=>state.gear[it.key]).map(it=>`<div class="li"><div><b>${esc(it.name)}</b><small>${esc(it.desc)}</small></div></div>`).join('')}</div>`;
+  if(state.crew.length)h+=`<div class="sect">Crew · $${state.crew.length*120}/day</div><div class="list">${state.crew.map(c=>`<div class="li"><div class="who">${portrait(c.look)}<div><b>${esc(c.name)}</b><small>Muscle +${c.pow}</small></div></div></div>`).join('')}</div>`;
+  return h;
+}
+function renderMe(){
+  const C=CH();
+  return `<div class="hustler">${portrait(C.look)}<div><h3>${esc(C.name)}</h3><div class="eyebrow" style="color:var(--dust);margin-top:4px">${esc(C.from)} · Level ${state.lvl}</div><p style="margin:6px 0 0;font-size:14px"><b style="color:var(--sodium)">${esc(C.perk)}.</b> ${esc(C.perkText)}</p></div></div>
+  ${state.pts?`<button class="btn go" data-act="spend" style="width:100%;margin-bottom:10px">Spend ${state.pts} stat point${state.pts>1?'s':''}</button>`:''}
+  ${Object.keys(STAT_INFO).map(k=>`<div class="statrow"><label>${STAT_INFO[k].label}</label><i><b style="width:${Math.min(100,state.stats[k]*8)}%"></b></i><span>${state.stats[k]}</span><small>${STAT_INFO[k].help}</small></div>`).join('')}
+  <div class="sect">Record</div><dl class="kv"><dt>Total sold</dt><dd>${money(state.record.sold)}</dd><dt>Best single sale</dt><dd>${money(state.record.best)}</dd><dt>Fights won</dt><dd>${state.record.won} of ${state.record.fights}</dd><dt>Net worth now</dt><dd>${money(state.cash+state.bank-state.debt)}</dd><dt>Rumors</dt><dd>${hearsRumors()?'You hear them':'Need 6 Smarts'}</dd></dl>`;
+}
+
+/* ================= ACTIONS ================= */
+function amt(){const v=Math.floor(+($('#amt')?.value||0));return v>0?v:0}
+function onAct(a){
+  if(a==='spend'){showModal(levelUpModal);return}
+  if(a==='cashout'){endGame();return}
+  if(a==='dep'){const v=Math.min(amt(),state.cash);state.cash-=v;state.bank+=v;if(v)toast(`Deposited ${money(v)}.`,'good')}
+  else if(a==='wd'){const v=Math.min(amt(),state.bank);state.bank-=v;state.cash+=v;if(v)toast(`Withdrew ${money(v)}.`)}
+  else if(a==='depAll'){state.bank+=state.cash;toast(`Deposited ${money(state.cash)}.`,'good');state.cash=0}
+  else if(a==='wdAll'){state.cash+=state.bank;toast(`Withdrew ${money(state.bank)}.`);state.bank=0}
+  else if(a==='pay'){const v=Math.min(amt(),state.cash,state.debt);state.cash-=v;state.debt-=v;if(v)toast(`Paid Uncle Dollar ${money(v)}.`,'good')}
+  else if(a==='payAll'){const v=Math.min(state.cash,state.debt);state.cash-=v;state.debt-=v;toast(state.debt?`Paid ${money(v)}. Still owe ${money(state.debt)}.`:'Debt cleared. Uncle Dollar nods once.','good')}
+  else if(a==='borrow'){const v=Math.min(amt(),Math.max(0,maxDebt()-state.debt));if(v<1)toast("He shakes his head. You're tapped out.",'bad');else{state.debt+=v;state.cash+=v;toast(`Borrowed ${money(v)} at 10% a day.`,'bad')}}
+  else if(a==='heal10'){const n=Math.min(10,state.maxHp-state.hp,Math.floor(state.cash/25));state.hp+=n;state.cash-=n*25}
+  else if(a==='healAll'){const n=Math.min(state.maxHp-state.hp,Math.floor(state.cash/25));state.hp+=n;state.cash-=n*25;toast(`Patched ${n} HP.`,'good')}
+  else if(a.startsWith('hire:')){const c=state.hires[+a.slice(5)];if(c&&state.cash>=c.cost&&state.crew.length<3){state.cash-=c.cost;state.crew.push({name:c.name,pow:c.pow,look:c.look});state.hires.splice(+a.slice(5),1);toast(`${c.name} is riding with you.`,'good')}}
+  else if(a.startsWith('fire:')){const c=state.crew.splice(+a.slice(5),1)[0];if(c)toast(`${c.name} goes home.`);if(used()>cap())toast('Trunk is over capacity. Sell something.','bad')}
+  else if(a.startsWith('item:')){const[,k,key]=a.split(':');const it=ITEMS[k].find(i=>i.key===key);if(it&&!state.gear[key]&&state.cash>=it.price){state.cash-=it.price;state.gear[key]=true;if(key==='grill'||key==='fit')state.stats.charm++;toast(`Got the ${it.name.toLowerCase()}.`,'good')}}
+  else if(a.startsWith('car:')){const i=+a.slice(4);const cost=CARS[i].price-Math.round(CARS[state.car].price/2);if(state.cash>=cost){state.cash-=cost;state.car=i;toast(`Pulled off the lot in the ${CARS[i].name}.`,'good');gainXP(20)}}
+  else if(a.startsWith('wpn:')){const i=+a.slice(4);if(state.cash>=WEAPONS[i].price){state.cash-=WEAPONS[i].price;state.weapon=i;toast(`Picked up the ${WEAPONS[i].name.toLowerCase()}.`,'good')}}
+  save();renderAll();
+}
+document.addEventListener('click',e=>{
+  if(!state||$('#game').hidden)return;
+  const t=e.target.closest('[data-buy],[data-sell],[data-go],[data-tab],[data-act]');if(!t||t.disabled)return;
+  if(t.closest('#modal'))return;
+  if(t.dataset.buy)openTrade(t.dataset.buy,'buy');
+  else if(t.dataset.sell)openTrade(t.dataset.sell,'sell');
+  else if(t.dataset.go)travel(t.dataset.go);
+  else if(t.dataset.tab){tab=t.dataset.tab;renderTabs()}
+  else if(t.dataset.act)onAct(t.dataset.act);
+});
+document.addEventListener('keydown',e=>{const t=e.target.closest&&e.target.closest('g[data-go]');if(t&&(e.key==='Enter'||e.key===' ')){e.preventDefault();travel(t.dataset.go)}});
+$('#btnMenu').onclick=()=>showModal((box,close)=>{
+  box.innerHTML=`<div class="eyebrow">Paused · Day ${state.day}</div><h2>Menu</h2><p>Your run saves automatically after every move.</p>
+  <div class="choices"><button class="btn" id="mBack">Back to the streets</button><button class="btn" id="mQuit">Quit to title (keeps your save)</button><button class="btn danger" id="mNew">Abandon this run</button></div>`;
+  box.querySelector('#mBack').onclick=close;
+  box.querySelector('#mQuit').onclick=()=>{save();modalQ.length=0;modalOpen=false;$('#modal').hidden=true;showStart()};
+  const n=box.querySelector('#mNew');n.onclick=()=>{if(n.dataset.armed){clearSave();state=null;modalQ.length=0;modalOpen=false;$('#modal').hidden=true;showStart()}else{n.dataset.armed='1';n.textContent='Tap again to abandon. This deletes the save.'}};
+});
+
+/* ================= SCREENS ================= */
+function showStart(){
+  $('#game').hidden=true;$('#start').hidden=false;
+  $('#chars').innerHTML=CHARS.map(c=>`<button class="char" data-char="${c.id}" aria-pressed="${c.id===selChar}">${portrait(c.look)}<div><h3>${esc(c.name)}</h3><div class="from">${esc(c.from)}</div><div class="perk"><b>${esc(c.perk)}.</b> ${esc(c.perkText)}</div></div>
+    <div class="statbars">${Object.keys(STAT_INFO).map(k=>`<div class="sb"><label>${STAT_INFO[k].label} ${c.stats[k]}</label><i><b style="width:${c.stats[k]*10}%"></b></i></div>`).join('')}</div></button>`).join('');
+  $('#chars').querySelectorAll('[data-char]').forEach(b=>b.onclick=()=>{selChar=b.dataset.char;$('#chars').querySelectorAll('[data-char]').forEach(x=>x.setAttribute('aria-pressed',x.dataset.char===selChar))});
+  const sv=loadSave();const cb=$('#btnContinue');cb.hidden=!sv;
+  if(sv)cb.textContent=`Continue: ${CHARS.find(c=>c.id===sv.cid).short}, day ${sv.day}`;
+  setScene($('#startSky'),'towers','dusk',false);
+  window.scrollTo(0,0);
+}
+function showGame(){$('#start').hidden=true;$('#game').hidden=false;window.scrollTo(0,0);renderAll()}
+$('#btnStart').onclick=()=>newGame(selChar);
+$('#btnContinue').onclick=()=>{const sv=loadSave();if(sv){state=sv;tab='map';showGame()}};
+
+function start(data){
+  if(data&&data.state&&!data.state.over){state=data.state;showGame()}else showStart();
+}
+try{window.claude?.hot?.snapshot?.(()=>({state}))}catch(e){}
+window.claude?.hot?.ready?window.claude.hot.ready(start):start(window.claude?.hot?.data??{});
+})();
+</script>
+
+</body>
+</html>
